@@ -17,8 +17,6 @@ PAYABLES = GSPREAD_CLIENT.open('payables')
 RECEIVABLES = GSPREAD_CLIENT.open('receivables')
 GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
 
-
-
 def start():
     """
     Start menu where the user can choose between 4 different tasks.
@@ -58,6 +56,7 @@ def start():
 
 
 def sale():
+    
     """
     Menu for accounting sales
     """
@@ -70,7 +69,7 @@ def sale():
     while True:
         choise = input("Choose an option: \n")
         if choise == '1':
-            credit_sale()
+            ACTION.credit_sale()
             print("\033c")
             break
         if choise == '2':
@@ -93,7 +92,7 @@ def credit_sale():
         print(num, '', customer)
         num += 1
     while True:
-        choise = input("Choose a customer: \n")
+        choise = int(input("Choose a customer: \n"))
         print("If adding a new customer, press 'n'\n")
         if choise == 'n':
             new_worksheet('rec')
@@ -105,7 +104,7 @@ def credit_sale():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
-            print(f"{existing_customers[int(choise) - 1]} chosen. Proceeding.")
+            print(f"{existing_customers[choise - 1]} chosen. Proceeding.")
             write_data(RECEIVABLES, existing_customers[int(choise) - 1])
             break
 
@@ -166,13 +165,21 @@ def write_data(name, name2):
         name2 (worksheet): worksheet for data
     """
     print('Add new data to file:')
-    data = []
-    date = input('Date: (DD.MM.)')
-    amount = input('Amount: (€)')
-    if amount < 0:
-        data = [date, '', amount]
-    else:
-        data = [date, amount]
+    print('Product:')
+    while True:
+        if spreadsheet == RECEIVABLES:
+            choise = input('Customer name:')
+            RECEIVABLES.add_worksheet(title=choise, rows=100, cols=26)
+            RECEIVABLES.worksheet(choise).format('A1:W1', {
+                "horizontalAlignment": "RIGHT",
+                "bold": True
+                })
+            first_row(RECEIVABLES, choise)
+            print('Worksheet created. Moving to details...')
+            break
+    #date = 
+    
+    
     append_data(name, name2, data)
     
 
@@ -273,7 +280,7 @@ def append_data(sheet, worksheet, data):
 
     Args:
         sheet (var): variable for the sheet to access
-        worksheet(name): name of worksheet to append data
+        worksheet(str): name of worksheet to append data
         data (list): list where each item is one column in worksheet
     """
     sheet = sheet.worksheet(worksheet)

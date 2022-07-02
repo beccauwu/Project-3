@@ -1,67 +1,32 @@
-class NonCurrentAsset:
+class Sales:
     """
-    Non-current asset class
+    Class for recording a transaction
     """
-    def __init__(self, price, stock, depreciation):
-        """class attributes
-
-        Args:
-            price (int/float): buying price of item
-            stock (int): amount owned
+    def __init__(self) -> None:
+        self.post = []
+    def credit_sale(self) -> None:
         """
-        self.price = price
-        self.stock = stock
-        self.depreciation = depreciation 
-        self.glaccount = 'Non-Current Assets'
-
-class Computers(NonCurrentAsset):
-    """
-    Computers class
-    """
-    pass   
-
-class CurrentAsset:
-    """
-    Current asset class
-    """
-    def __init__(self, glaccount):
-        self.glaccounts = ['Current Assets', glaccount]
-
-class SaleOfCurrentAsset(CurrentAsset):
-    """
-    Class for sales of current assets
-    """
-    def __init__(self, glaccount, gross):
-        super().__init__(glaccount)
-        self.tax = 0.25*gross
-        self.net = 0.75*gross
-        self.gross = gross
-    def money_amounts(self):
+        Credit sale method - changes GL accounts accordingly
         """
-        Returns:
-            list: a list of amounts related to sale
+        self.post = ['Trade Receivables', 'Current Assets']
+    def cash_sale(self) -> None:
         """
-        return [self.net, self.tax, self.gross]
+        Cash sale method - changes GL accounts accordingly
+        """
+        self.post = ['Sales', 'Sales Tax', 'Current Assets']
 
-class SoapBarsSale(SaleOfCurrentAsset):
+class SoapBarSale(Sales):
     """
-    Class for soap bars
+    Class for soap bar sales
+
     Args:
-        SaleOfCurrentAsset (class): handles the sale of soap bar
+        Sales (class): processes data
     """
-    def __init__(self, amount, crdr, bankcash):
-        """
-        Args:
-            amount (int): Amount sold
-            crdr (str): wether sale was on credit or debit
-            bankcash (str): wether sale was in bank or cash
-        """
-        self.sellprice = 10
-        self.total = self.sellprice * amount
-        if crdr == 'cr':
-            self.account = 'Trade Receivables'
-        elif bankcash == 'bank':
-            self.account = 'Bank'
-        else:
-            self.account = 'Cash'
-        super().__init__(self.account, self.total)
+    
+    def __init__(self, amount) -> None:
+        self.gross = 10
+        self.amount = 1
+        self.net = 10*0.75
+        self.tax = 10*0.25
+        self.amount = amount
+        super().__init__()
