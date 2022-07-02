@@ -34,8 +34,8 @@ def start():
         choise = input("Choose an option: \n")
         if choise == '1':
             print("Taking you to sales accounting...\n")
-            sale()
             print("\033c")
+            sale()
             break
         if choise == '2':
             print("Taking you to purchases accounting...\n")
@@ -87,25 +87,29 @@ def credit_sale():
     """
     Show existing customers and add new if not in list
     """
-    print_list = ""
     existing_customers = get_worksheet_titles(RECEIVABLES)
+    num = 1
     for customer in existing_customers:
-        print_list += f"{existing_customers.index(customer)}: {customer}\n"
+        print(num, '', customer)
+        num += 1
     while True:
         choise = input("Choose a customer: \n")
-        print(print_list)
-        print("If adding a new customer, press 'n'")
+        print("If adding a new customer, press 'n'\n")
         if choise == 'n':
             new_worksheet('rec')
             break
-        if not isinstance(choise, int):
-            raise TypeError('Only integers are allowed')
-        if choise > len(existing_customers):
-            raise ValueError('Chosen value is not valid')
-        write_data(RECEIVABLES, existing_customers[choise])
-        break
+        try:
+            int(choise) < len(existing_customers)
+        except TypeError as type_error:
+            print(f"Invalid character: {type_error}, try again")
+        except ValueError as value_error:
+            print(f"Chosen value {value_error} is not valid, please try again")
+        else:
+            print(f"{existing_customers[int(choise) - 1]} chosen. Proceeding.")
+            write_data(RECEIVABLES, existing_customers[int(choise) - 1])
+            break
 
-def new_worksheet(type_of):
+def new_worksheet(spreadsheet):
     """
     Add a new worksheet to spreadsheet
     Args:
@@ -113,7 +117,7 @@ def new_worksheet(type_of):
     """
     print('Creating new worksheet...')
     while True:
-        if type_of == 'rec':
+        if spreadsheet == RECEIVABLES:
             choise = input('Customer name:')
             RECEIVABLES.add_worksheet(title=choise, rows=100, cols=26)
             RECEIVABLES.worksheet(choise).format('A1:W1', {
@@ -181,10 +185,8 @@ def get_worksheet_titles(spreadsheet):
     """
     print('Getting list of worksheets...')
     worksheet_list = []
-    ind = 1
-    for worksheet in spreadsheet:
-        worksheet_list.append(worksheet)
-        ind += 1
+    for worksheet in spreadsheet.worksheets():
+        worksheet_list.append(worksheet.title)
     return worksheet_list
 
 def purchase():
