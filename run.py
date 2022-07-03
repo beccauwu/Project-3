@@ -69,7 +69,8 @@ def sale():
     while True:
         choise = input("Choose an option: \n")
         if choise == '1':
-            ACTION.credit_sale()
+            new_action = Sales()
+            new_action.credit_sale()
             print("\033c")
             break
         if choise == '2':
