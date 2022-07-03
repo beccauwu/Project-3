@@ -2,7 +2,8 @@ from pprint import pprint
 from random import randint
 import gspread
 from google.oauth2.service_account import Credentials
-from pyclasses import Sales
+from pyclasses import SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale
+from funcs import product_menu
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -60,30 +61,20 @@ def sale():
     """
     Menu for accounting sales
     """
-    action = Sales()
-    print("""
-                --------Sales--------
-                1. Credit sale\n\
-                2. Cash sale\n\
-                3. Back to menu\n\
-                    """)
-    while True:
-        choise = input("Choose an option: \n")
-        if choise == '1':
-            action.credit_sale()
-            action.write_transaction()
-            print("\033c")
-        if choise == '2':
-            cash_sale()
-            print("\033c")
-            break
-        if choise == '3':
-            start()
-            print("\033c")
-            break
-        print("Not a valid input please enter a number 1-3")
-
-
+    product = product_menu()
+    print(f"you chose product {product[0]}. amount:{product[1]}")
+    if product[0] == 1:
+        action = SoapBarSale
+        action.__init__(product[1])
+    if product[0] == 2:
+        action = LiquidSoapSale
+        action.__init__(product[1])
+    if product[0] == 3:
+        action = CoconutOilSale
+        action.__init__(product[1])
+    if product[0] == 4:
+        action = LuteSale
+        action.__init__(product[1])
 
 
 

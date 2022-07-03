@@ -1,18 +1,17 @@
-from funcs import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data, gen_rand_list
+from funcs import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, STOCK, choose_customer, append_data, gen_rand_list, cash_or_credit
 
 class Sales():
     """
     Class for recording a transaction
     """
-    def __init__(self, price) -> None:
+    def __init__(self, price, amount) -> None:
         self.date = input('Enter transaction date: (DD.MM.)')
         self.customer = choose_customer()
-        self.type = None
+        self.type = cash_or_credit()
         self.trans_id = 'S'
         self.inv_no = f"INV{gen_rand_list(2)}"
-        self.product = product_menu()
-        self.amount = self.product[1]
-        self.gross = price
+        self.amount = amount
+        self.gross = price * amount
     def credit_sale(self) -> None:
         """
         Credit sale method
@@ -42,7 +41,7 @@ class Sales():
         if self.type == 1:
             append_data(
                 GENERAL_LEDGER, 'Trade Receivables',
-                [self.customer, self.trans_id, SoapBarSale.gross]
+                [self.customer, self.trans_id, self.gross]
                 )
             append_data(
                 GENERAL_LEDGER, 'Current Assets',
@@ -52,21 +51,22 @@ class Sales():
                 RECEIVABLES, self.customer, ['Invoice', self.gross, self.inv_no]
                 )
             append_data(
-                ACCOUNTS, 'sdb', [self.date, self.customer, self.net, self.tax, self.gross]
+                ACCOUNTS, 'sdb',
+                [self.date, self.customer, self.gross * 0.75, self.gross * 0.25, self.gross]
                 )
         if self.type == 2:
             append_data(
-                GENERAL_LEDGER, 'Sales', [self.customer, self.trans_id, self.net]
+                GENERAL_LEDGER, 'Sales', [self.customer, self.trans_id, self.gross * 0.75]
             )
             append_data(
-                GENERAL_LEDGER, 'Sales Tax', [self.customer, self.trans_id, self.tax]
+                GENERAL_LEDGER, 'Sales Tax', [self.customer, self.trans_id, self.gross * 0.25]
             )
             append_data(
                 GENERAL_LEDGER,
                 'Current Assets', ['', '', '', [self.customer, self.trans_id, self.gross]]
             )
             append_data(
-                ACCOUNTS, 'cash', [self.date, self.customer[2], self.customer[1], self.gross]
+                ACCOUNTS, 'cash', [self.date, self.customer[1], self.customer[0], self.gross]
             )
 
 class SoapBarSale(Sales):
@@ -76,9 +76,11 @@ class SoapBarSale(Sales):
     Args:
         Sales (class): processes data
     """
-    def __init__(self) -> None:
+    print('SoapBar called')
+    def __init__(self, amount= None) -> None:
         self.price = 6
-        super().__init__(self.price)
+        self.amount = amount
+        super().__init__(self.price, amount)
 
 class LiquidSoapSale(Sales):
     """
@@ -87,9 +89,10 @@ class LiquidSoapSale(Sales):
     Args:
         Sales (class): processes data
     """
-    def __init__(self) -> None:
+    print('LiquidSoap called')
+    def __init__(self, amount= None) -> None:
         self.price = 5
-        super().__init__(self.price)
+        super().__init__(self.price, amount)
 class CoconutOilSale(Sales):
     """
     Class for soap bar sales
@@ -97,9 +100,10 @@ class CoconutOilSale(Sales):
     Args:
         Sales (class): processes data
     """
-    def __init__(self) -> None:
+    print('Coconut called')
+    def __init__(self, amount= None) -> None:
         self.price = 7
-        super().__init__(self.price)
+        super().__init__(self.price, amount)
 class LuteSale(Sales):
     """
     Class for soap bar sales
@@ -107,39 +111,8 @@ class LuteSale(Sales):
     Args:
         Sales (class): processes data
     """
-    def __init__(self) -> None:
+    print('Lute called')
+    def __init__(self, amount= None) -> None:
         self.price = 20
-        super().__init__(self.price)
+        super().__init__(self.price, amount)
 
-def product_menu():
-    """
-    prints products and based on choise calls a parent
-    """
-    print(
-        """
-        ---Products---
-        1. Soap Bar
-        2. Liquid Soap
-        3. Coconut Oil
-        4. NaOH
-        """
-        )
-    while True:
-        choise = input("Choose an option: \n")
-        if choise == '1':
-            bars = input("How many soap bars?\n")
-            print(f"Got it. {bars} bars of soap")
-            return [1, bars]
-        if choise == '2':
-            bottles = input("How many bottles")
-            print(f"Got it. {bottles} bottles of soap")
-            return [2, bottles]
-        if choise == '3':
-            jars = input("How many jars?\n")
-            print(f"Got it. {jars} jars of coconut oil")
-            return [3, jars]
-        if choise == '4':
-            cans = input("How many cans?\n")
-            print(f"Got it. {cans} cans of lute")
-            return [4, cans]
-        print("Not a valid input please enter a number 1-4")

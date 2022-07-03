@@ -16,10 +16,13 @@ ACCOUNTS = GSPREAD_CLIENT.open('accounts')
 PAYABLES = GSPREAD_CLIENT.open('payables')
 RECEIVABLES = GSPREAD_CLIENT.open('receivables')
 GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
+STOCK = GSPREAD_CLIENT.open('stock')
 
 def choose_customer():
-    """
-    Show existing customers and add new if not in list
+    """Show existing customers and add new if not in list
+
+    Returns:
+        list: [Customer name, account no]
     """
     existing_customers = get_worksheet_titles(RECEIVABLES)
     num = 1
@@ -32,7 +35,7 @@ def choose_customer():
         if choise == 'n':
             name = input('Customer name:')
             new = new_worksheet('rec', name)
-            return [new, name]
+            return [name, new]
         try:
             int(choise) < len(existing_customers)
         except TypeError as type_error:
@@ -156,3 +159,74 @@ def gen_rand_list(num):
     while len(rand_list) <= num:
         rand_list.append(randint(0, 9))
     return str(rand_list)
+
+def product_menu():
+    """
+    prints products and based on choise calls a parent
+    """
+    print(
+        """
+        ---Products---
+        1. Soap Bar
+        2. Liquid Soap
+        3. Coconut Oil
+        4. NaOH
+        """
+        )
+    while True:
+        choise = input("Choose an option: \n")
+        if choise == '1':
+            products = how_many(input("How many soap bars?\n"))
+            print(f"Got it. {products} bars of soap")
+            return [1, products]
+        if choise == '2':
+            products = how_many(input("How many bottles"))
+            print(f"Got it. {products} bottles of soap")
+            return [2, products]
+        if choise == '3':
+            products = how_many(input("How many jars?\n"))
+            print(f"Got it. {products} jars of coconut oil")
+            return [3, products]
+        if choise == '4':
+            products = how_many(input("How many cans?\n"))
+            print(f"Got it. {products} cans of lute")
+            return [4, products]
+        print("Not a valid input please enter a number 1-4")
+
+def how_many(var):
+    """prompts for an amount of something
+
+    Args:
+        var (function): input with appropriate text
+
+    Returns:
+        str: 'chosen amount'
+    """
+    while True:
+        products = var
+        try:
+            int(products)
+        except TypeError as typ_err:
+            print(f"Chosen value {typ_err} is not an integer.")
+            print('Please try again.')
+        else:
+            return products
+
+def cash_or_credit():
+    """
+    chacks type of transaction
+    """
+    print("""
+                --------Sales--------
+                1. Credit sale\n\
+                2. Cash sale\n\
+                    """)
+    while True:
+        choise = input("Choose type of sale: \n")
+        if choise == '1':
+            print('Chose credit sale \n')
+            return 1
+        if choise == '2':
+            print('Chose cash sale')
+            return 2
+        print("Not a valid input please enter a number 1-3")
