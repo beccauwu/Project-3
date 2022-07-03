@@ -1,4 +1,4 @@
-from run import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data
+from run import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data, get_new_transaction_id
 
 class SoapBarSale():
     """
@@ -8,12 +8,13 @@ class SoapBarSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
+        self.date = input('Enter transaction date: (DD.MM.)')
         self.gross = 10*amount
         self.amount = 1
         self.net = self.gross*0.75
         self.tax = self.gross*0.25
         self.amount = amount
-        
+
 class LiquidSoapSale():
     """
     Class for soap bar sales
@@ -22,6 +23,7 @@ class LiquidSoapSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
+        self.date = input('Enter transaction date: (DD.MM.)')
         self.gross = 10*amount
         self.amount = 1
         self.net = self.gross*0.75
@@ -35,6 +37,7 @@ class CoconutOilSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
+        self.date = input('Enter transaction date: (DD.MM.)')
         self.gross = 10*amount
         self.amount = 1
         self.net = self.gross*0.75
@@ -48,6 +51,7 @@ class LuteSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
+        self.date = input('Enter transaction date: (DD.MM.)')
         self.gross = 10*amount
         self.amount = 1
         self.net = self.gross*0.75
@@ -93,9 +97,8 @@ class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
     """
     def __init__(self) -> None:
         self.customer = choose_customer()
-        self.date = None
         self.type = None
-        self.trans_id = None
+        self.trans_id = get_new_transaction_id
         self.inv_no = None
         self.product = product_menu()
         if self.product[1] == 1:
@@ -111,12 +114,12 @@ class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
         Credit sale method - changes type to 1
         """
         self.type = 1
-        choose_customer()
     def cash_sale(self) -> None:
         """
         Cash sale method - changes type to 2
         """
         self.type = 2
+    
     def write_transaction(self):
         """
         Writes transaction to accounts
@@ -142,8 +145,9 @@ class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
                 GENERAL_LEDGER, 'Sales Tax', [self.customer, self.trans_id, self.tax]
             )
             append_data(
-                GENERAL_LEDGER, 'Current Assets', ['', '', '', [self.customer, self.trans_id, self.gross]]
+                GENERAL_LEDGER,
+                'Current Assets', ['', '', '', [self.customer, self.trans_id, self.gross]]
             )
             append_data(
-                
+                ACCOUNTS, 'cash', [self.date, self.customer[2], self.customer[1], self.gross]
             )

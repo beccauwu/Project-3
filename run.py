@@ -1,4 +1,5 @@
 from pprint import pprint
+from random import randint
 import gspread
 from google.oauth2.service_account import Credentials
 from pyclasses import Sales
@@ -71,7 +72,6 @@ def sale():
         if choise == '1':
             action.credit_sale()
             print("\033c")
-            break
         if choise == '2':
             cash_sale()
             print("\033c")
@@ -97,7 +97,7 @@ def choose_customer():
         if choise == 'n':
             name = input('Customer name:')
             new = new_worksheet('rec', name)
-            return new
+            return [new, name]
         try:
             int(choise) < len(existing_customers)
         except TypeError as type_error:
@@ -289,5 +289,36 @@ def append_data(sheet, worksheet, data):
     sheet = sheet.worksheet(worksheet)
     sheet.append_row(data)
     print(f"Successfully added data to {sheet}")
+
+def get_new_transaction_id(t, s, c):
+    """Generates a new transaction id
+    Id is 7 characters:
+    T, S, C, R, R, R, R
+    T: Transaction type (sale/purchase)
+    S: Specifier (credit/cash transaction)
+    C: Customer/supplier first character
+    R: Random integer 1000-9999
+
+    Args:
+        int (t): 1 for sale, 2 for purchase
+        int (s): 1 for credit, 2 for cash
+        str (c): customer/supplier name
+
+    Returns:
+        str: new transaction id
+    """
+    print("generating transaction id...")
+    trans_id = ''
+    if t == 1:
+        trans_id += 'S'
+    if t == 2:
+        trans_id += 'P'
+    if s == 1:
+        trans_id += 'C'
+    if s == 2:
+        trans_id += 'D'
+    trans_id += str(c)[0]
+    trans_id += str(randint(1000, 9999))
+    return trans_id
 
 start()
