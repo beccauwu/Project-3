@@ -115,4 +115,3 @@ class LuteSale(Sales):
     def __init__(self, amount= None) -> None:
         self.price = 20
         super().__init__(self.price, amount)
-
