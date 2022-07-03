@@ -1,4 +1,4 @@
-from run import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data, get_new_transaction_id
+from run import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data, get_inv_no, get_new_transaction_id
 
 class SoapBarSale():
     """
@@ -98,8 +98,8 @@ class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
     def __init__(self) -> None:
         self.customer = choose_customer()
         self.type = None
-        self.trans_id = get_new_transaction_id
-        self.inv_no = None
+        self.trans_id = None
+        self.inv_no = get_inv_no()
         self.product = product_menu()
         if self.product[1] == 1:
             SoapBarSale.__init__(self, self.product[2])
@@ -111,9 +111,12 @@ class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
             LuteSale.__init__(self, self.product[2])
     def credit_sale(self) -> None:
         """
-        Credit sale method - changes type to 1
+        Credit sale method 
+        - changes type to 1
+        - calls function to generate a transaction id
         """
         self.type = 1
+        self.trans_id = get_new_transaction_id(1, self.type, self.customer[1])
     def cash_sale(self) -> None:
         """
         Cash sale method - changes type to 2

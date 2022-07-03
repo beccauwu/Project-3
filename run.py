@@ -318,7 +318,27 @@ def get_new_transaction_id(t, s, c):
     if s == 2:
         trans_id += 'D'
     trans_id += str(c)[0]
-    trans_id += str(randint(1000, 9999))
+    trans_id += gen_rand_list(3)
     return trans_id
+def get_inv_no():
+    """Generates a new invoice number
+    """
+    inv_no = 'INV'
+    inv_no += gen_rand_list(2)
+    return inv_no
+
+def gen_rand_list(num):
+    """generates a list with random digits
+
+    Args:
+        num (int): length of list
+
+    Returns:
+        str: string with random digits
+    """
+    rand_list = []
+    while len(rand_list) <= num:
+        rand_list.append(randint(0, 9))
+    return str(rand_list)
 
 start()
