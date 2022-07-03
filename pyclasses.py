@@ -1,3 +1,5 @@
+from run import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data
+
 class SoapBarSale():
     """
     Class for soap bar sales
@@ -6,11 +8,12 @@ class SoapBarSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
-        self.gross = 10
+        self.gross = 10*amount
         self.amount = 1
-        self.net = 10*0.75
-        self.tax = 10*0.25
+        self.net = self.gross*0.75
+        self.tax = self.gross*0.25
         self.amount = amount
+        
 class LiquidSoapSale():
     """
     Class for soap bar sales
@@ -19,10 +22,10 @@ class LiquidSoapSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
-        self.gross = 10
+        self.gross = 10*amount
         self.amount = 1
-        self.net = 10*0.75
-        self.tax = 10*0.25
+        self.net = self.gross*0.75
+        self.tax = self.gross*0.25
         self.amount = amount
 class CoconutOilSale():
     """
@@ -32,10 +35,10 @@ class CoconutOilSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
-        self.gross = 10
+        self.gross = 10*amount
         self.amount = 1
-        self.net = 10*0.75
-        self.tax = 10*0.25
+        self.net = self.gross*0.75
+        self.tax = self.gross*0.25
         self.amount = amount
 class LuteSale():
     """
@@ -45,10 +48,10 @@ class LuteSale():
         Sales (class): processes data
     """
     def __init__(self, amount) -> None:
-        self.gross = 10
+        self.gross = 10*amount
         self.amount = 1
-        self.net = 10*0.75
-        self.tax = 10*0.25
+        self.net = self.gross*0.75
+        self.tax = self.gross*0.25
         self.amount = amount
 
 def product_menu():
@@ -89,7 +92,11 @@ class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
     Class for recording a transaction
     """
     def __init__(self) -> None:
-        self.post = []
+        self.customer = choose_customer()
+        self.date = None
+        self.type = None
+        self.trans_id = None
+        self.inv_no = None
         self.product = product_menu()
         if self.product[1] == 1:
             SoapBarSale.__init__(self, self.product[2])
@@ -101,11 +108,42 @@ class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
             LuteSale.__init__(self, self.product[2])
     def credit_sale(self) -> None:
         """
-        Credit sale method - changes GL accounts accordingly
+        Credit sale method - changes type to 1
         """
-        self.post = ['Trade Receivables', 'Current Assets']
+        self.type = 1
+        choose_customer()
     def cash_sale(self) -> None:
         """
-        Cash sale method - changes GL accounts accordingly
+        Cash sale method - changes type to 2
         """
-        self.post = ['Sales', 'Sales Tax', 'Current Assets']
+        self.type = 2
+    def write_transaction(self):
+        """
+        Writes transaction to accounts
+        """
+        if self.type == 1:
+            append_data(
+                GENERAL_LEDGER, 'Trade Receivables', [self.customer, self.trans_id, self.gross]
+                )
+            append_data(
+                GENERAL_LEDGER, 'Current Assets', ['', '', '', self.customer, self.trans_id, self.gross]
+                )
+            append_data(
+                RECEIVABLES, self.customer, ['Invoice', self.gross, self.inv_no]
+                )
+            append_data(
+                ACCOUNTS, 'sdb', [self.date, self.customer, self.net, self.tax, self.gross]
+                )
+        if self.type == 2:
+            append_data(
+                GENERAL_LEDGER, 'Sales', [self.customer, self.trans_id, self.net]
+            )
+            append_data(
+                GENERAL_LEDGER, 'Sales Tax', [self.customer, self.trans_id, self.tax]
+            )
+            append_data(
+                GENERAL_LEDGER, 'Current Assets', ['', '', '', [self.customer, self.trans_id, self.gross]]
+            )
+            append_data(
+                
+            )

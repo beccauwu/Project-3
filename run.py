@@ -1,7 +1,7 @@
 from pprint import pprint
 import gspread
 from google.oauth2.service_account import Credentials
-from pyclasses import *
+from pyclasses import Sales
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -56,10 +56,10 @@ def start():
 
 
 def sale():
-    
     """
     Menu for accounting sales
     """
+    action = Sales()
     print("""
                 --------Sales--------
                 1. Credit sale\n\
@@ -69,8 +69,7 @@ def sale():
     while True:
         choise = input("Choose an option: \n")
         if choise == '1':
-            new_action = Sales()
-            new_action.credit_sale()
+            action.credit_sale()
             print("\033c")
             break
         if choise == '2':
@@ -83,7 +82,7 @@ def sale():
             break
         print("Not a valid input please enter a number 1-3")
 
-def credit_sale():
+def choose_customer():
     """
     Show existing customers and add new if not in list
     """
@@ -96,8 +95,9 @@ def credit_sale():
         choise = int(input("Choose a customer: \n"))
         print("If adding a new customer, press 'n'\n")
         if choise == 'n':
-            new_worksheet('rec')
-            break
+            name = input('Customer name:')
+            new = new_worksheet('rec', name)
+            return new
         try:
             int(choise) < len(existing_customers)
         except TypeError as type_error:
@@ -105,11 +105,11 @@ def credit_sale():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
+            account_no = RECEIVABLES.worksheet(existing_customers[choise - 1]).acell('A1').value
             print(f"{existing_customers[choise - 1]} chosen. Proceeding.")
-            write_data(RECEIVABLES, existing_customers[int(choise) - 1])
-            break
+            return [existing_customers[choise - 1], account_no]
 
-def new_worksheet(spreadsheet):
+def new_worksheet(spreadsheet, name):
     """
     Add a new worksheet to spreadsheet
     Args:
@@ -118,15 +118,14 @@ def new_worksheet(spreadsheet):
     print('Creating new worksheet...')
     while True:
         if spreadsheet == RECEIVABLES:
-            choise = input('Customer name:')
-            RECEIVABLES.add_worksheet(title=choise, rows=100, cols=26)
-            RECEIVABLES.worksheet(choise).format('A1:W1', {
+            RECEIVABLES.add_worksheet(title=name, rows=100, cols=26)
+            RECEIVABLES.worksheet(name).format('A1:W1', {
                 "horizontalAlignment": "RIGHT",
                 "bold": True
                 })
-            first_row(RECEIVABLES, choise)
+            row = first_row(RECEIVABLES, name)
             print('Worksheet created. Moving to details...')
-            break
+            return row
 def first_row(name, name2):
     """Adds first row to worksheet
 
@@ -137,8 +136,9 @@ def first_row(name, name2):
     print('Formatting first row...')
     num = new_account_number(name)
     if name == RECEIVABLES:
-        append_data(RECEIVABLES, name2, [f"RL{num}", 'Dr (€)', 'Cr (€)'])
+        append_data(RECEIVABLES, name2, [num, 'Dr (€)', 'Cr (€)'])
         write_data(RECEIVABLES, name2)
+    return num
 
 def new_account_number(name):
     """Gets a new account number for new worksheets
@@ -156,7 +156,9 @@ def new_account_number(name):
     A1 = name.worksheet_list[-1].acell('A1').value
     num = int(''.join(c for c in A1 if not c.isdigit()))
     num += 10
-    return num
+    num = f"RL{num}"
+    print(f"New account number is: {num}")
+    return f"RL{num}"
 
 def write_data(name, name2):
     """Gets new data to write, then passes on to append_data
