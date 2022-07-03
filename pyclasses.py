@@ -1,62 +1,115 @@
-from run import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data, get_inv_no, get_new_transaction_id
+from funcs import ACCOUNTS, GENERAL_LEDGER, RECEIVABLES, choose_customer, append_data, gen_rand_list
 
-class SoapBarSale():
+class Sales():
+    """
+    Class for recording a transaction
+    """
+    def __init__(self, price) -> None:
+        self.date = input('Enter transaction date: (DD.MM.)')
+        self.customer = choose_customer()
+        self.type = None
+        self.trans_id = 'S'
+        self.inv_no = f"INV{gen_rand_list(2)}"
+        self.product = product_menu()
+        self.amount = self.product[1]
+        self.gross = price
+    def credit_sale(self) -> None:
+        """
+        Credit sale method
+        - type 1
+        - adds signifier for credit in transid
+        """
+        print('initiated credit sale method')
+        self.type = 1
+        self.trans_id += 'C'
+        self.trans_id += str(self.customer[0])[0]
+        self.trans_id += gen_rand_list(3)
+    def cash_sale(self) -> None:
+        """
+        Cash sale method
+        - type 2
+        - adds signifier for debit in transid
+        """
+        self.type = 2
+        self.trans_id += 'D'
+        self.trans_id += str(self.customer[0])[0]
+        self.trans_id += gen_rand_list(3)
+
+    def write_transaction(self):
+        """
+        Writes transaction to accounts
+        """
+        if self.type == 1:
+            append_data(
+                GENERAL_LEDGER, 'Trade Receivables',
+                [self.customer, self.trans_id, SoapBarSale.gross]
+                )
+            append_data(
+                GENERAL_LEDGER, 'Current Assets',
+                ['', '', '', self.customer, self.trans_id, self.gross]
+                )
+            append_data(
+                RECEIVABLES, self.customer, ['Invoice', self.gross, self.inv_no]
+                )
+            append_data(
+                ACCOUNTS, 'sdb', [self.date, self.customer, self.net, self.tax, self.gross]
+                )
+        if self.type == 2:
+            append_data(
+                GENERAL_LEDGER, 'Sales', [self.customer, self.trans_id, self.net]
+            )
+            append_data(
+                GENERAL_LEDGER, 'Sales Tax', [self.customer, self.trans_id, self.tax]
+            )
+            append_data(
+                GENERAL_LEDGER,
+                'Current Assets', ['', '', '', [self.customer, self.trans_id, self.gross]]
+            )
+            append_data(
+                ACCOUNTS, 'cash', [self.date, self.customer[2], self.customer[1], self.gross]
+            )
+
+class SoapBarSale(Sales):
     """
     Class for soap bar sales
 
     Args:
         Sales (class): processes data
     """
-    def __init__(self, amount) -> None:
-        self.date = input('Enter transaction date: (DD.MM.)')
-        self.gross = 10*amount
-        self.amount = 1
-        self.net = self.gross*0.75
-        self.tax = self.gross*0.25
-        self.amount = amount
+    def __init__(self) -> None:
+        self.price = 6
+        super().__init__(self.price)
 
-class LiquidSoapSale():
+class LiquidSoapSale(Sales):
     """
     Class for soap bar sales
 
     Args:
         Sales (class): processes data
     """
-    def __init__(self, amount) -> None:
-        self.date = input('Enter transaction date: (DD.MM.)')
-        self.gross = 10*amount
-        self.amount = 1
-        self.net = self.gross*0.75
-        self.tax = self.gross*0.25
-        self.amount = amount
-class CoconutOilSale():
+    def __init__(self) -> None:
+        self.price = 5
+        super().__init__(self.price)
+class CoconutOilSale(Sales):
     """
     Class for soap bar sales
 
     Args:
         Sales (class): processes data
     """
-    def __init__(self, amount) -> None:
-        self.date = input('Enter transaction date: (DD.MM.)')
-        self.gross = 10*amount
-        self.amount = 1
-        self.net = self.gross*0.75
-        self.tax = self.gross*0.25
-        self.amount = amount
-class LuteSale():
+    def __init__(self) -> None:
+        self.price = 7
+        super().__init__(self.price)
+class LuteSale(Sales):
     """
     Class for soap bar sales
 
     Args:
         Sales (class): processes data
     """
-    def __init__(self, amount) -> None:
-        self.date = input('Enter transaction date: (DD.MM.)')
-        self.gross = 10*amount
-        self.amount = 1
-        self.net = self.gross*0.75
-        self.tax = self.gross*0.25
-        self.amount = amount
+    def __init__(self) -> None:
+        self.price = 20
+        super().__init__(self.price)
 
 def product_menu():
     """
@@ -90,67 +143,3 @@ def product_menu():
             print(f"Got it. {cans} cans of lute")
             return [4, cans]
         print("Not a valid input please enter a number 1-4")
-
-class Sales(SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale):
-    """
-    Class for recording a transaction
-    """
-    def __init__(self) -> None:
-        self.customer = choose_customer()
-        self.type = None
-        self.trans_id = None
-        self.inv_no = get_inv_no()
-        self.product = product_menu()
-        if self.product[1] == 1:
-            SoapBarSale.__init__(self, self.product[2])
-        if self.product[1] == 2:
-            LiquidSoapSale.__init__(self, self.product[2])
-        if self.product[1] == 3:
-            CoconutOilSale.__init__(self, self.product[2])
-        if self.product[1] == 4:
-            LuteSale.__init__(self, self.product[2])
-    def credit_sale(self) -> None:
-        """
-        Credit sale method 
-        - changes type to 1
-        - calls function to generate a transaction id
-        """
-        self.type = 1
-        self.trans_id = get_new_transaction_id(1, self.type, self.customer[1])
-    def cash_sale(self) -> None:
-        """
-        Cash sale method - changes type to 2
-        """
-        self.type = 2
-    
-    def write_transaction(self):
-        """
-        Writes transaction to accounts
-        """
-        if self.type == 1:
-            append_data(
-                GENERAL_LEDGER, 'Trade Receivables', [self.customer, self.trans_id, self.gross]
-                )
-            append_data(
-                GENERAL_LEDGER, 'Current Assets', ['', '', '', self.customer, self.trans_id, self.gross]
-                )
-            append_data(
-                RECEIVABLES, self.customer, ['Invoice', self.gross, self.inv_no]
-                )
-            append_data(
-                ACCOUNTS, 'sdb', [self.date, self.customer, self.net, self.tax, self.gross]
-                )
-        if self.type == 2:
-            append_data(
-                GENERAL_LEDGER, 'Sales', [self.customer, self.trans_id, self.net]
-            )
-            append_data(
-                GENERAL_LEDGER, 'Sales Tax', [self.customer, self.trans_id, self.tax]
-            )
-            append_data(
-                GENERAL_LEDGER,
-                'Current Assets', ['', '', '', [self.customer, self.trans_id, self.gross]]
-            )
-            append_data(
-                ACCOUNTS, 'cash', [self.date, self.customer[2], self.customer[1], self.gross]
-            )
