@@ -4,7 +4,7 @@ from random import randint
 import gspread
 from google.oauth2.service_account import Credentials
 from pyclasses import SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale, Sales
-from funcs import product_menu, get_date, cash_or_credit, choose_customer, gen_rand_list, sales_trans_id
+from funcs import product_menu, get_date, cash_or_credit, choose_customer, write_cr_transaction, write_dr_transaction
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -65,29 +65,8 @@ def sale():
     product = product_menu()
     date = get_date()
     trans_type = cash_or_credit()
-    customer = choose_customer()
-    print(f"you chose product {product[0]}. amount:{product[1]}")
-    if product[0] == 1:
-        action = SoapBarSale
-        action.amount = amount
-        action.date = date
-        action.type = trans_type
-        action.customer = customer
-        if action.type == 1:
-            action.inv_no = inv_no
-            action.trans_id = sales_trans_id(1)
-            
-        else:
-            action.cash_sale()
-    if product[0] == 2:
-        action = LiquidSoapSale
-        action.__init__(product[1])
-    if product[0] == 3:
-        action = CoconutOilSale
-        action.__init__(product[1])
-    if product[0] == 4:
-        action = LuteSale
-        action.__init__(product[1])
+    if trans_type == 1:
+        customer = choose_customer()
 
 
 

@@ -285,58 +285,74 @@ def sales_trans_id(var):
     trans_id += gen_rand_list(3)
     return trans_id
 
-def write_cr_transaction(details: list, date: str, gross: float, customer= None):
+def get_gross_total(product: str, amount: int):
+    """calculates the gross total of a transaction
+
+    Args:
+        product (str): product sold
+        amount (int): amount sold
+
+    Returns:
+        _type_: _description_
+    """
+    print('Calculating the gross total of your sale...')
+    product_prices = {
+        'Soap Bar': 6,
+        'Liquid Soap': 5,
+        'Coconut Oil': 8,
+        'Lute': 20,
+    }
+    return int(product_prices.get(product) * amount)
+
+def write_cr_transaction(details: list, date: str, customer: list):
     """passes transaction data to append_data
 
     Args:
-        details (list): product name, amount
+        details (list): [product name, amount]
         date (str): transaction date
-        trans_type (int): transaction type(cash/credit)
         gross (float): gross transaction amount
-        customer (str, optional): customer name, 
-        only applicable on credit transactions. Defaults to None.
+        customer (str): [customer name, account number]
     """
     print('Writing transaction data...')
     product = details[0]
     amount = details[1]
+    gross = get_gross_total(product, amount)
     trans_id = sales_trans_id(1)
     inv_no = f"INV{gen_rand_list(2)}"
-    sales_cappend_ls = [
+    sales_append_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [customer, trans_id, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', customer, trans_id, gross]],
     [RECEIVABLES, customer, ['Invoice', gross, inv_no]],
     [ACCOUNTS, 'sdb', [f"{date[1]}.{date[2]}", customer, gross * 0.75, gross * 0.25, gross]],
     [STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]]
     ]
-    for data in sales_cappend_ls:
-        data_index = sales_cappend_ls.index(data) + 1
-        list_length = len(sales_cappend_ls) + 1
+    for data in sales_append_ls:
+        data_index = sales_append_ls.index(data) + 1
+        list_length = len(sales_append_ls) + 1
         print(f"Writing data ({data_index}/{list_length}")
         append_data(data)
 
-def write_dr_transaction(details: list, date: str, gross: float, customer: str):
+def write_dr_transaction(details: list, date: str, gross: float):
     """passes transaction data to append_data
 
     Args:
         details (list): product name, amount
         date (str): transaction date
-        trans_type (int): transaction type(cash/credit)
         gross (float): gross transaction amount
-        customer (str): customer name
     """
     print('Writing transaction data...')
     product = details[0]
     amount = details[1]
     trans_id = sales_trans_id(2)
-    sales_dappend_ls = [
+    sales_append_ls = [
         [GENERAL_LEDGER, 'Sales', [customer, trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', [customer, trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', [customer, trans_id, gross]]],
-        [ACCOUNTS, 'cash', [date, customer[1], customer[0], gross]],
+        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]],
         [STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]]
     ]
-    for data in sales_dappend_ls:
-        data_index = sales_dappend_ls.index(data) + 1
-        list_length = len(sales_dappend_ls) + 1
+    for data in sales_append_ls:
+        data_index = sales_append_ls.index(data) + 1
+        list_length = len(sales_append_ls) + 1
         print(f"Writing data ({data_index}/{list_length}")
         append_data(data)
