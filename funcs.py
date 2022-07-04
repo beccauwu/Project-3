@@ -213,22 +213,18 @@ def how_many(var):
         else:
             return int(products)
 
-def cash_or_credit():
+def cash_or_credit(trans_type):
     """
-    chacks type of transaction
+    checks type of transaction
     """
-    print("""
-                --------Sales--------
-                1. Credit sale\n\
-                2. Cash sale\n\
-                    """)
+    print(f"--------{trans_type}s--------\n1. Credit {trans_type}\n\2. Cash {trans_type}\n")
     while True:
-        choise = input("Choose type of sale: \n")
+        choise = input(f"Choose type of {trans_type}: \n")
         if choise == '1':
-            print('Chose credit sale \n')
+            print(f'Chose credit {trans_type} \n')
             return 1
         if choise == '2':
-            print('Chose cash sale')
+            print(f'Chose cash {trans_type}')
             return 2
         print("Not a valid input please enter a number 1-3")
 
