@@ -230,3 +230,100 @@ def cash_or_credit():
             print('Chose cash sale')
             return 2
         print("Not a valid input please enter a number 1-3")
+
+def get_date():
+    """Gets transaction date from user input
+    and checks if it is valid
+
+    Returns:
+        str: the date
+    """
+    while True:
+        date = input('Enter transaction date: (DDMM)')
+        date_list = []
+        str(date)
+        if check_if_date(date):
+            date_list.append(str(date[0:1]))
+            date_list.append(str(date[2:3]))
+            return date_list
+
+def check_if_date(date):
+    """Checks if date is the correct format
+
+    Args:
+        date (str): date to check
+
+    Returns:
+        boolean: True if is correct format,
+        False if not
+    """
+    if len(date) == 4:
+        return True
+    print(len(date))
+    print('The entered date is invalid')
+    print('Please try again')
+    return False
+
+def sales_trans_id(var):
+    """generates a transaction ID
+
+    Args:
+        var (int): transaction type
+
+    Returns:
+        str: completed transaction ID
+    """
+    trans_id = 'S'
+    if var == 1:
+        trans_id += 'C'
+    elif var == 2:
+        trans_id += 'D'
+    trans_id += gen_rand_list(3)
+    return trans_id
+
+def write_transaction(product, amount, date, trans_type, customer, inv_no, gross, trans_id):
+    """
+    Writes transaction to accounts
+    """
+    sales_credit_append_list = [
+    [GENERAL_LEDGER, 'Trade Receivables', [customer, trans_id, gross]],
+    [GENERAL_LEDGER, 'Current Assets', ['', '', '', customer, trans_id, gross]],
+    [RECEIVABLES, customer, ['Invoice', gross, inv_no]],
+    [ACCOUNTS, 'sdb', [f"{date[1]}.{date[2]}", customer, net, tax, gross]],
+    [STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]]
+    ]
+    net = int(gross) * 0.75
+    tax = int(gross) * 0.25
+    if trans_type == 1:
+        append_data(
+            GENERAL_LEDGER, 'Trade Receivables', [customer, trans_id, gross]
+            )
+        append_data(
+            GENERAL_LEDGER, 'Current Assets', ['', '', '', customer, trans_id, gross]
+            )
+        append_data(
+            RECEIVABLES, customer, ['Invoice', gross, inv_no]
+            )
+        append_data(
+            ACCOUNTS, 'sdb', [f"{date[1]}.{date[2]}", customer, net, tax, gross]
+            )
+        append_data(
+            STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]
+        )
+    if trans_type == 2:
+        append_data(
+            GENERAL_LEDGER, 'Sales', [customer, trans_id, gross * 0.75]
+        )
+        append_data(
+            GENERAL_LEDGER, 'Sales Tax', [customer, trans_id, gross * 0.25]
+        )
+        append_data(
+            GENERAL_LEDGER,
+            'Current Assets', ['', '', '', [customer, trans_id, gross]]
+        )
+        append_data(
+            ACCOUNTS, 'cash', [date, customer[1], customer[0], gross]
+        )
+        append_data(
+            STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]
+        )

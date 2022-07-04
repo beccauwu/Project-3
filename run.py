@@ -1,9 +1,10 @@
+from curses import ALL_MOUSE_EVENTS
 from pprint import pprint
 from random import randint
 import gspread
 from google.oauth2.service_account import Credentials
-from pyclasses import SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale
-from funcs import product_menu
+from pyclasses import SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale, Sales
+from funcs import product_menu, get_date, cash_or_credit, choose_customer, gen_rand_list, sales_trans_id
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -61,11 +62,26 @@ def sale():
     """
     Menu for accounting sales
     """
-    product = product_menu()
+    product_det = product_menu()
+    product = product_det[1]
+    amount = product_det[2]
+    date = get_date()
+    trans_type = cash_or_credit()
+    customer = choose_customer()
+    inv_no = f"INV{gen_rand_list(2)}"
     print(f"you chose product {product[0]}. amount:{product[1]}")
     if product[0] == 1:
         action = SoapBarSale
-        action.__init__(product[1])
+        action.amount = amount
+        action.date = date
+        action.type = trans_type
+        action.customer = customer
+        if action.type == 1:
+            action.inv_no = inv_no
+            action.trans_id = sales_trans_id(1)
+            
+        else:
+            action.cash_sale()
     if product[0] == 2:
         action = LiquidSoapSale
         action.__init__(product[1])
