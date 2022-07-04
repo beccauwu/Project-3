@@ -277,59 +277,67 @@ def get_date():
         str: the date
     """
     while True:
-        date = input('Enter transaction date: (DDMM)')
+        date = input('Enter transaction date: (DDMMYYYY)')
         str(date)
         if check_if_date(date):
-            return f"{date[0:2]}.{date[2:4]}."
+            return f"{date[0:2]}.{date[2:4]}.{date[4:8]}"
 
 def check_if_date(date):
     """Checks if date is the correct format
+    and validates date
 
     Args:
         date (str): date to check
 
     Returns:
-        boolean: True if is correct format,
+        True if is correct format,
         False if not
     """
     #correct length?
-    if len(date) == 4:
+    if len(date) == 8:
         #if uneven month, see if value of days is less than 32
         if int(date[1]) % 2 != 0:
             try:
-                int(date[2:4]) < 32
-            except ValueError as val_err:
-                print(f'The month entered does not have {val_err} days.')
+                int(date[0:2]) < 32
+            except ValueError as uneven:
+                print(f'The month entered does not have {uneven} days.')
                 print('Please try again.')
                 return False
         #if even month see if value of days is less than 31
         elif int(date[1]) % 2 == 0:
             try:
-                int(date[2:3]) < 31
-            except ValueError as val_err:
-                print(f'The month entered does not have {val_err} days.')
+                int(date[0:2]) < 31
+            except ValueError as even:
+                print(f'The month entered does not have {even} days.')
                 print('Please try again.')
                 return False
-        #if february see if value of days less than 30
-        #idk how to check for leap years yet
-        elif date[0:2] == '02':
+        #if february leap year see if value of days less than 30
+        elif int(date[4:8]) % 4 == 0 and int(date[4:8]) % 100 != 0:
             try:
-                int(date[2:4]) < 30
-            except ValueError as val_err:
-                print(f'The month entered does not have {val_err} days.')
+                int(date[0:2]) < 30
+            except ValueError as leap:
+                print(f'The month entered does not have {leap} days.')
+                print('Please try again.')
+                return False
+        #if february non leap year see if value of days less than 29
+        elif int(date[4:8]) % 4 != 0:
+            try:
+                int(date[0:2]) < 29
+            except ValueError as non_leap:
+                print(f'The month entered does not have {non_leap} days.')
                 print('Please try again.')
                 return False
         #check that month number is less than 13
         try:
-            int(date[0:2]) < 13
+            int(date[2:4]) < 13
         except ValueError as val_err:
             print(f"There isn't a month number {val_err}.")
             print('Please try again.')
             return False
         else:
             return True
-    print(f"The date entered ({date}) is not of correct format (DDMM),")
-    print(f"you have entered {len(date)} characters instead of 4.")
+    print(f"The date entered ({date}) is not of correct format (DDMMYYYY),")
+    print(f"you have entered {len(date)} characters instead of 8.")
     print('Please try again.')
     return False
 
