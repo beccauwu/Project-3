@@ -182,19 +182,19 @@ def product_menu():
         if choise == '1':
             products = how_many(input("How many soap bars?\n"))
             print(f"Got it. {products} bars of soap")
-            return [1, products]
+            return ['Soap Bar', products]
         if choise == '2':
             products = how_many(input("How many bottles"))
             print(f"Got it. {products} bottles of soap")
-            return [2, products]
+            return ['Liquid Soap', products]
         if choise == '3':
             products = how_many(input("How many jars?\n"))
             print(f"Got it. {products} jars of coconut oil")
-            return [3, products]
+            return ['Coconut Oil', products]
         if choise == '4':
             products = how_many(input("How many cans?\n"))
             print(f"Got it. {products} cans of lute")
-            return [4, products]
+            return ['NaOH', products]
         print("Not a valid input please enter a number 1-4")
 
 def how_many(var):
@@ -214,7 +214,7 @@ def how_many(var):
             print(f"Chosen value {typ_err} is not an integer.")
             print('Please try again.')
         else:
-            return products
+            return int(products)
 
 def cash_or_credit():
     """
@@ -300,7 +300,7 @@ def get_gross_total(product: str, amount: int):
         'Soap Bar': 6,
         'Liquid Soap': 5,
         'Coconut Oil': 8,
-        'Lute': 20,
+        'NaOH': 20,
     }
     return int(product_prices.get(product) * amount)
 
@@ -310,21 +310,22 @@ def write_cr_transaction(details: list, date: str, customer: list):
     Args:
         details (list): [product name, amount]
         date (str): transaction date
-        gross (float): gross transaction amount
-        customer (str): [customer name, account number]
+        customer (list): [customer name, account number]
     """
     print('Writing transaction data...')
     product = details[0]
     amount = details[1]
     gross = get_gross_total(product, amount)
+    account_no = customer[1]
+    name = customer[0]
     trans_id = sales_trans_id(1)
     inv_no = f"INV{gen_rand_list(2)}"
     sales_append_ls = [
-    [GENERAL_LEDGER, 'Trade Receivables', [customer, trans_id, gross]],
-    [GENERAL_LEDGER, 'Current Assets', ['', '', '', customer, trans_id, gross]],
-    [RECEIVABLES, customer, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [f"{date[1]}.{date[2]}", customer, gross * 0.75, gross * 0.25, gross]],
-    [STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]]
+    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
+    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
+    [RECEIVABLES, name, ['Invoice', gross, inv_no]],
+    [ACCOUNTS, 'sdb', [f"{date[0]}.{date[1]}", account_no, gross * 0.75, gross * 0.25, gross]],
+    [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
     ]
     for data in sales_append_ls:
         data_index = sales_append_ls.index(data) + 1
@@ -332,24 +333,24 @@ def write_cr_transaction(details: list, date: str, customer: list):
         print(f"Writing data ({data_index}/{list_length}")
         append_data(data)
 
-def write_dr_transaction(details: list, date: str, gross: float):
+def write_dr_transaction(details: list, date: str):
     """passes transaction data to append_data
 
     Args:
         details (list): product name, amount
         date (str): transaction date
-        gross (float): gross transaction amount
     """
     print('Writing transaction data...')
     product = details[0]
     amount = details[1]
+    gross = get_gross_total(product, amount)
     trans_id = sales_trans_id(2)
     sales_append_ls = [
-        [GENERAL_LEDGER, 'Sales', [customer, trans_id, gross * 0.75]],
-        [GENERAL_LEDGER, 'Sales Tax', [customer, trans_id, gross * 0.25]],
-        [GENERAL_LEDGER, 'Current Assets', ['', '', '', [customer, trans_id, gross]]],
-        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]],
-        [STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]]
+        [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
+        [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
+        [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
+        [ACCOUNTS, 'cash', [f"{date[0]}.{date[1]}", 'sales', trans_id, gross]],
+        [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
     ]
     for data in sales_append_ls:
         data_index = sales_append_ls.index(data) + 1

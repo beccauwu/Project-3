@@ -1,9 +1,5 @@
-from curses import ALL_MOUSE_EVENTS
-from pprint import pprint
-from random import randint
 import gspread
 from google.oauth2.service_account import Credentials
-from pyclasses import SoapBarSale, LiquidSoapSale, CoconutOilSale, LuteSale, Sales
 from funcs import product_menu, get_date, cash_or_credit, choose_customer, write_cr_transaction, write_dr_transaction
 
 SCOPE = [
@@ -62,11 +58,14 @@ def sale():
     """
     Menu for accounting sales
     """
-    product = product_menu()
+    details = product_menu()
     date = get_date()
     trans_type = cash_or_credit()
     if trans_type == 1:
         customer = choose_customer()
+        write_cr_transaction(details, date, customer)
+    elif trans_type == 2:
+        write_dr_transaction(details, date)
 
 
 
