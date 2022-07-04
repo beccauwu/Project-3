@@ -1,20 +1,4 @@
-import gspread
-from google.oauth2.service_account import Credentials
-from funcs import product_menu, purchases_menu, get_date, cash_or_credit, choose_customer, write_cr_sale, write_dr_sale, write_cr_purchase, write_dr_purchase
-
-SCOPE = [
-    "https://www.googleapis.com/auth/spreadsheets",
-    "https://www.googleapis.com/auth/drive.file",
-    "https://www.googleapis.com/auth/drive"
-    ]
-
-CREDS = Credentials.from_service_account_file('creds.json')
-SCOPED_CREDS = CREDS.with_scopes(SCOPE)
-GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
-ACCOUNTS = GSPREAD_CLIENT.open('accounts')
-PAYABLES = GSPREAD_CLIENT.open('payables')
-RECEIVABLES = GSPREAD_CLIENT.open('receivables')
-GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
+from funcs import *
 
 def start():
     """

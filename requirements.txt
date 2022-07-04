@@ -1,1 +1,4 @@
 # Your requirements go here
+gspread
+google-oauth
+progress

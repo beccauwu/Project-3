@@ -1,6 +1,6 @@
 from pprint import pprint
 from random import randint
-from progress.bar import FillingCirclesBar
+from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -99,8 +99,8 @@ def new_rl_account_number(ssh):
     """
     print('Generating account number...')
     wsh_list = [wsh.title for wsh in ssh]
-    A1 = get_cell_val(RECEIVABLES, wsh_list[-1], 'A1')
-    num = int(''.join(c for c in A1 if c.isdigit()))
+    cell_a1 = get_cell_val(RECEIVABLES, wsh_list[-1], 'A1')
+    num = int(''.join(c for c in cell_a1 if c.isdigit()))
     num += 10
     print(f"New account number is: RL{num}")
     return f"RL{num}"
@@ -140,11 +140,8 @@ def append_data(data_list):
         [spreadsheet, worksheet, data]
     """
     print('Reading data...')
-    with FillingCirclesBar('Writing data', max=len(data_list)) as progress_bar:
+    with ChargingBar('Writing data|', max=len(data_list)) as progress_bar:
         for data in data_list:
-            # data_index = sales_append_ls.index(data) + 1
-            # list_length = len(sales_append_ls)
-            # print(f"Writing data ({data_index}/{list_length}")
             spreadsheet = data[0]
             worksheet = data[1]
             data_to_write = data[2]
