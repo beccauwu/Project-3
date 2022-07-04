@@ -62,13 +62,10 @@ def sale():
     """
     Menu for accounting sales
     """
-    product_det = product_menu()
-    product = product_det[1]
-    amount = product_det[2]
+    product = product_menu()
     date = get_date()
     trans_type = cash_or_credit()
     customer = choose_customer()
-    inv_no = f"INV{gen_rand_list(2)}"
     print(f"you chose product {product[0]}. amount:{product[1]}")
     if product[0] == 1:
         action = SoapBarSale

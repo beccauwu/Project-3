@@ -134,17 +134,20 @@ def get_worksheet_titles(spreadsheet):
         worksheet_list.append(worksheet.title)
     return worksheet_list
 
-def append_data(sheet, worksheet, data):
+def append_data(data):
     """Appends data to specified sheet
 
     Args:
-        sheet (var): variable for the sheet to access
-        worksheet(str): name of worksheet to append data
-        data (list): list where each item is one column in worksheet
+        data (list): list of data
+        [spreadsheet, worksheet, data]
     """
-    sheet = sheet.worksheet(worksheet)
-    sheet.append_row(data)
-    print(f"Successfully added data to {sheet}")
+    list_of_things = data
+    spreadsheet = list_of_things[1]
+    worksheet = list_of_things[2]
+    data_to_write = list_of_things[3]
+    sheet = spreadsheet.worksheet(worksheet)
+    sheet.append_row(data_to_write)
+    print(f"Successfully added data to {worksheet}")
 
 def gen_rand_list(num):
     """generates a list with random digits
@@ -281,49 +284,40 @@ def sales_trans_id(var):
     trans_id += gen_rand_list(3)
     return trans_id
 
-def write_transaction(product, amount, date, trans_type, customer, inv_no, gross, trans_id):
+def write_transaction(details: list, date: str, trans_type: int, gross: float, customer= None):
+    """passes transaction data to append_data
+
+    Args:
+        product (str): Product sold
+        amount (int): Amount sold
+        date (str): Transaction date
+        trans_type (int): transaction type
+        customer (str): customer
+        inv_no (str): invoice number
+        gross (int/float): gross amount
+        trans_id (str): transaction id
     """
-    Writes transaction to accounts
-    """
+    product = details[0]
+    amount = details[1]
+    trans_id = sales_trans_id(trans_type)
+    inv_no = f"INV{gen_rand_list(2)}"
     sales_credit_append_list = [
     [GENERAL_LEDGER, 'Trade Receivables', [customer, trans_id, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', customer, trans_id, gross]],
     [RECEIVABLES, customer, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [f"{date[1]}.{date[2]}", customer, net, tax, gross]],
+    [ACCOUNTS, 'sdb', [f"{date[1]}.{date[2]}", customer, gross * 0.75, gross * 0.25, gross]],
     [STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]]
     ]
-    net = int(gross) * 0.75
-    tax = int(gross) * 0.25
+    sales_cash_append_list = [
+        [GENERAL_LEDGER, 'Sales', [customer, trans_id, gross * 0.75]],
+        [GENERAL_LEDGER, 'Sales Tax', [customer, trans_id, gross * 0.25]],
+        [GENERAL_LEDGER, 'Current Assets', ['', '', '', [customer, trans_id, gross]]],
+        [ACCOUNTS, 'cash', [date, customer[1], customer[0], gross]],
+        [STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]]
+    ]
     if trans_type == 1:
-        append_data(
-            GENERAL_LEDGER, 'Trade Receivables', [customer, trans_id, gross]
-            )
-        append_data(
-            GENERAL_LEDGER, 'Current Assets', ['', '', '', customer, trans_id, gross]
-            )
-        append_data(
-            RECEIVABLES, customer, ['Invoice', gross, inv_no]
-            )
-        append_data(
-            ACCOUNTS, 'sdb', [f"{date[1]}.{date[2]}", customer, net, tax, gross]
-            )
-        append_data(
-            STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]
-        )
+        for data in sales_credit_append_list:
+            append_data(data)
     if trans_type == 2:
-        append_data(
-            GENERAL_LEDGER, 'Sales', [customer, trans_id, gross * 0.75]
-        )
-        append_data(
-            GENERAL_LEDGER, 'Sales Tax', [customer, trans_id, gross * 0.25]
-        )
-        append_data(
-            GENERAL_LEDGER,
-            'Current Assets', ['', '', '', [customer, trans_id, gross]]
-        )
-        append_data(
-            ACCOUNTS, 'cash', [date, customer[1], customer[0], gross]
-        )
-        append_data(
-            STOCK, product, [f"{date[1]}.{date[2]}", '', amount, gross, gross/amount]
-        )
+        for data in sales_cash_append_list:
+            append_data(data)
