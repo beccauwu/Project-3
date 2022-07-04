@@ -34,7 +34,7 @@ def choose_customer():
         print("If adding a new customer, press 'n'\n")
         if choise == 'n':
             name = input('Customer name:')
-            new = new_worksheet('rec', name)
+            new = new_worksheet(RECEIVABLES, name)
             return [name, new]
         try:
             int(choise) < len(existing_customers)
@@ -47,79 +47,76 @@ def choose_customer():
             print(f"{existing_customers[choise - 1]} chosen. Proceeding.")
             return [existing_customers[choise - 1], account_no]
 
-def new_worksheet(spreadsheet, name):
+def choose_supplier():
+    """Show existing suppliers and add new if not in list
+
+    Returns:
+        list: [Supplier name, account no]
     """
-    Add a new worksheet to spreadsheet
-    Args:
-        spreadsheet (name): spreadsheet to add to
-    """
-    print('Creating new worksheet...')
+    existing_suppliers = get_worksheet_titles(PAYABLES)
+    num = 1
+    for supplier in existing_suppliers:
+        print(num, '', supplier)
+        num += 1
     while True:
-        if spreadsheet == RECEIVABLES:
-            RECEIVABLES.add_worksheet(title=name, rows=100, cols=26)
-            RECEIVABLES.worksheet(name).format('A1:W1', {
-                "horizontalAlignment": "RIGHT",
-                "bold": True
-                })
-            row = first_row(RECEIVABLES, name)
-            print('Worksheet created. Moving to details...')
-            return row
-def first_row(name, name2):
-    """Adds first row to worksheet
+        choise = int(input("Choose a supplier: \n"))
+        print("If adding a new supplier, press 'n'\n")
+        if choise == 'n':
+            name = input('Supplier name:')
+            new = new_worksheet(PAYABLES, name)
+            return [name, new]
+        try:
+            int(choise) < len(existing_suppliers)
+        except TypeError as type_error:
+            print(f"Invalid character: {type_error}, try again")
+        except ValueError as value_error:
+            print(f"Chosen value {value_error} is not valid, please try again")
+        else:
+            account_no = RECEIVABLES.worksheet(existing_suppliers[choise - 1]).acell('A1').value
+            print(f"{existing_suppliers[choise - 1]} chosen. Proceeding.")
+            return [existing_suppliers[choise - 1], account_no]
+
+def new_worksheet(spreadsheet, title):
+    """creates a new worksheet using a base template
 
     Args:
-        name (spreadsheet): spreadsheet
-        name2 (worksheet): worksheet
+        spreadheet (const): spreadsheet to add to
+        title (str): new worksheet title
     """
-    print('Formatting first row...')
-    num = new_account_number(name)
-    if name == RECEIVABLES:
-        append_data(RECEIVABLES, name2, [num, 'Dr (€)', 'Cr (€)'])
-        write_data(RECEIVABLES, name2)
-    return num
+    new_sheet = spreadsheet.duplicate_sheet('Base')
+    new_sheet.update_title(title)
+    new_sheet.update('A1')
 
-def new_account_number(name):
+def new_rl_account_number(ssh):
     """Gets a new account number for new worksheets
 
     Args:
-        name (var): spreadsheet to index
+        ssh (var): spreadsheet to index
 
     Returns:
         int: new number
     """
     print('Generating account number...')
-    worksheet_list = []
-    for worksheet in name:
-        worksheet_list.append(worksheet.title)
-    A1 = name.worksheet_list[-1].acell('A1').value
-    num = int(''.join(c for c in A1 if not c.isdigit()))
+    wsh_list = [wsh.title for wsh in ssh]
+    A1 = get_cell_val(RECEIVABLES, wsh_list[-1], 'A1')
+    num = int(''.join(c for c in A1 if c.isdigit()))
     num += 10
-    num = f"RL{num}"
-    print(f"New account number is: {num}")
+    print(f"New account number is: RL{num}")
     return f"RL{num}"
 
-def write_data(name, name2):
-    """Gets new data to write, then passes on to append_data
+def get_cell_val(ssh, wsh, cell):
+    """Gets cell value from worksheet
 
     Args:
-        name (spreadsheet): spreadsheet data is added to
-        name2 (worksheet): worksheet for data
+        ssh (const): spreadsheet to access
+        wsh (str): worksheet in spreadsheet
+        cell (str): cell to read value from
+
+    Returns:
+        str: cell calue
     """
-    print('Add new data to file:')
-    print('Product:')
-    while True:
-        if spreadsheet == RECEIVABLES:
-            choise = input('Customer name:')
-            RECEIVABLES.add_worksheet(title=name, rows=100, cols=26)
-            RECEIVABLES.worksheet(choise).format('A1:W1', {
-                "horizontalAlignment": "RIGHT",
-                "bold": True
-                })
-            first_row(RECEIVABLES, choise)
-            print('Worksheet created. Moving to details...')
-            break
-    #date = 
-    
+    cv = ssh.worksheet(wsh).acell(cell).value
+    return cv
 
 def get_worksheet_titles(spreadsheet):
     """
