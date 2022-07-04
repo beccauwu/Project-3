@@ -143,9 +143,9 @@ def append_data(data):
     """
     print('Adding data...')
     list_of_things = data
-    spreadsheet = list_of_things[1]
-    worksheet = list_of_things[2]
-    data_to_write = list_of_things[3]
+    spreadsheet = list_of_things[0]
+    worksheet = list_of_things[1]
+    data_to_write = list_of_things[2]
     sheet = spreadsheet.worksheet(worksheet)
     sheet.append_row(data_to_write)
     print(f"Successfully added data to {worksheet}")
