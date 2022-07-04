@@ -341,23 +341,6 @@ def check_if_date(date):
     print('Please try again.')
     return False
 
-def sales_trans_id(var):
-    """generates a transaction ID
-
-    Args:
-        var (int): transaction type
-
-    Returns:
-        str: completed transaction ID
-    """
-    trans_id = 'S'
-    if var == 1:
-        trans_id += 'C'
-    elif var == 2:
-        trans_id += 'D'
-    trans_id += gen_rand_list(3)
-    return trans_id
-
 def get_gross_total(product: str, amount: int):
     """calculates the gross total of a transaction
 
