@@ -132,21 +132,26 @@ def get_worksheet_titles(spreadsheet):
         worksheet_list.append(worksheet.title)
     return worksheet_list
 
-def append_data(data):
+def append_data(data_list):
     """Appends data to specified sheet
 
     Args:
         data (list): list of data
         [spreadsheet, worksheet, data]
     """
-    print('Adding data...')
-    list_of_things = data
-    spreadsheet = list_of_things[0]
-    worksheet = list_of_things[1]
-    data_to_write = list_of_things[2]
-    sheet = spreadsheet.worksheet(worksheet)
-    sheet.append_row(data_to_write)
-    print(f"Successfully added data to {worksheet}")
+    print('Reading data...')
+    with FillingCirclesBar('Writing data', max=len(data_list)) as progress_bar:
+        for data in data_list:
+            # data_index = sales_append_ls.index(data) + 1
+            # list_length = len(sales_append_ls)
+            # print(f"Writing data ({data_index}/{list_length}")
+            spreadsheet = data[0]
+            worksheet = data[1]
+            data_to_write = data[2]
+            sheet = spreadsheet.worksheet(worksheet)
+            sheet.append_row(data_to_write)
+            progress_bar.next()
+    print('Operation Successful.')
 
 def gen_rand_list(num):
     """generates a list with random digits
@@ -157,10 +162,10 @@ def gen_rand_list(num):
     Returns:
         str: string with random digits
     """
-    rand_str = []
+    rand_str = ""
     while len(rand_str) <= num:
-        rand_str += randint(0, 9)
-    return str(rand_str)
+        rand_str += str(randint(0, 9))
+    return rand_str
 
 def product_menu():
     """
@@ -252,7 +257,7 @@ def cash_or_credit(trans_type: str):
     """
     checks type of transaction
     """
-    print(f"--------{trans_type}s--------\n1. Credit {trans_type}\n\2. Cash {trans_type}\n")
+    print(f"--------{trans_type}s--------\n1. Credit {trans_type}\n2. Cash {trans_type}\n")
     while True:
         choise = input(f"Choose type of {trans_type.lower()}: \n")
         if choise == '1':
@@ -343,20 +348,16 @@ def write_cr_sale(details: list, date: str, customer: list):
     gross = get_gross_total(product, amount)
     account_no = customer[1]
     name = customer[0]
-    trans_id = f"SC{gen_rand_list(3)}"
-    inv_no = f"INV{gen_rand_list(2)}"
-    sales_append_ls = [
+    trans_id = f"SC{str(gen_rand_list(3))}"
+    inv_no = f"INV{str(gen_rand_list(2))}"
+    data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
     [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [f"{date[0]}.{date[1]}", account_no, gross * 0.75, gross * 0.25, gross]],
-    [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
+    [ACCOUNTS, 'sdb', [f"{date[0:2]}.{date[2:4]}", account_no, gross * 0.75, gross * 0.25, gross]],
+    [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
     ]
-    for data in sales_append_ls:
-        data_index = sales_append_ls.index(data) + 1
-        list_length = len(sales_append_ls)
-        print(f"Writing data ({data_index}/{list_length}")
-        append_data(data)
+    append_data(data_ls)
 
 def write_dr_sale(details: list, date: str):
     """passes transaction data to append_data
@@ -374,16 +375,16 @@ def write_dr_sale(details: list, date: str):
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
-        [ACCOUNTS, 'cash', [f"{date[0]}.{date[1]}", 'sales', trans_id, gross]],
-        [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
+        [ACCOUNTS, 'cash', [f"{date[0:2]}.{date[2:4]}", 'sales', trans_id, gross]],
+        [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
     ]
-    bar = FillingCirclesBar('Writing data', max=5)
+    progress_bar = FillingCirclesBar('Writing data', max=5)
     for data in sales_append_ls:
         # data_index = sales_append_ls.index(data) + 1
         # list_length = len(sales_append_ls) + 1
         # print(f"Writing data ({data_index}/{list_length}")
         append_data(data)
-        bar.next()
+        progress_bar.next()
 
 def write_cr_purchase(details: list, date: str, customer: list):
     """passes transaction data to append_data
@@ -405,8 +406,8 @@ def write_cr_purchase(details: list, date: str, customer: list):
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
     [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [f"{date[0]}.{date[1]}", account_no, gross * 0.75, gross * 0.25, gross]],
-    [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
+    [ACCOUNTS, 'sdb', [f"{date[0:2]}.{date[2:4]}", account_no, gross * 0.75, gross * 0.25, gross]],
+    [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
     ]
     for data in sales_append_ls:
         data_index = sales_append_ls.index(data) + 1
@@ -430,8 +431,8 @@ def write_dr_purchase(details: list, date: str):
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
-        [ACCOUNTS, 'cash', [f"{date[0]}.{date[1]}", 'sales', trans_id, gross]],
-        [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
+        [ACCOUNTS, 'cash', [f"{date[0:2]}.{date[2:4]}", 'sales', trans_id, gross]],
+        [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
     ]
     for data in sales_append_ls:
         data_index = sales_append_ls.index(data) + 1
