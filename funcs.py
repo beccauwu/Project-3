@@ -351,8 +351,8 @@ def write_cr_sale(details: list, date: str, customer: list):
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
     [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [f"{date[0:2]}.{date[2:4]}", account_no, gross * 0.75, gross * 0.25, gross]],
-    [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
+    [ACCOUNTS, 'sdb', [date, account_no, gross * 0.75, gross * 0.25, gross]],
+    [STOCK, product, [date, '', amount, gross, gross/amount]]
     ]
     append_data(data_ls)
 
@@ -372,8 +372,8 @@ def write_dr_sale(details: list, date: str):
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
-        [ACCOUNTS, 'cash', [f"{date[0:2]}.{date[2:4]}", 'sales', trans_id, gross]],
-        [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
+        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]],
+        [STOCK, product, [date, '', amount, gross, gross/amount]]
     ]
     append_data(data_ls)
 
@@ -397,8 +397,8 @@ def write_cr_purchase(details: list, date: str, customer: list):
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
     [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [f"{date[0:2]}.{date[2:4]}", account_no, gross * 0.75, gross * 0.25, gross]],
-    [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
+    [ACCOUNTS, 'sdb', [date, account_no, gross * 0.75, gross * 0.25, gross]],
+    [STOCK, product, [date, '', amount, gross, gross/amount]]
     ]
     append_data(data_ls)
 
@@ -418,7 +418,7 @@ def write_dr_purchase(details: list, date: str):
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
-        [ACCOUNTS, 'cash', [f"{date[0:2]}.{date[2:4]}", 'sales', trans_id, gross]],
-        [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
+        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]],
+        [STOCK, product, [date, '', amount, gross, gross/amount]]
     ]
     append_data(data_ls)
