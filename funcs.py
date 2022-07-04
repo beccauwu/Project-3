@@ -159,10 +159,10 @@ def gen_rand_list(num):
     Returns:
         str: string with random digits
     """
-    rand_list = []
-    while len(rand_list) <= num:
-        rand_list.append(randint(0, 9))
-    return str(rand_list)
+    rand_str = []
+    while len(rand_str) <= num:
+        rand_str. += randint(0, 9)
+    return str(rand_str)
 
 def product_menu():
     """
@@ -244,12 +244,9 @@ def get_date():
     """
     while True:
         date = input('Enter transaction date: (DDMM)')
-        date_list = []
         str(date)
         if check_if_date(date):
-            date_list.append(str(date[0:1]))
-            date_list.append(str(date[2:3]))
-            return date_list
+            return f"{date[0:2]}.{date[2:4]}."
 
 def check_if_date(date):
     """Checks if date is the correct format
@@ -318,7 +315,7 @@ def write_cr_transaction(details: list, date: str, customer: list):
     gross = get_gross_total(product, amount)
     account_no = customer[1]
     name = customer[0]
-    trans_id = sales_trans_id(1)
+    trans_id = f"SC{gen_rand_list(3)}"
     inv_no = f"INV{gen_rand_list(2)}"
     sales_append_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
@@ -344,7 +341,7 @@ def write_dr_transaction(details: list, date: str):
     product = details[0]
     amount = details[1]
     gross = get_gross_total(product, amount)
-    trans_id = sales_trans_id(2)
+    trans_id = f"SD{gen_rand_list(3)}"
     sales_append_ls = [
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
