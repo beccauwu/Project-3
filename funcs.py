@@ -1,5 +1,6 @@
 from pprint import pprint
 from random import randint
+from progress.bar import FillingCirclesBar
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -158,7 +159,7 @@ def gen_rand_list(num):
     """
     rand_str = []
     while len(rand_str) <= num:
-        rand_str. += randint(0, 9)
+        rand_str += randint(0, 9)
     return str(rand_str)
 
 def product_menu():
@@ -172,6 +173,40 @@ def product_menu():
         2. Liquid Soap
         3. Coconut Oil
         4. NaOH
+        """
+        )
+    while True:
+        choise = input("Choose an option: \n")
+        if choise == '1':
+            products = how_many(input("How many soap bars?\n"))
+            print(f"Got it. {products} bars of soap")
+            return ['Soap Bar', products]
+        if choise == '2':
+            products = how_many(input("How many bottles"))
+            print(f"Got it. {products} bottles of soap")
+            return ['Liquid Soap', products]
+        if choise == '3':
+            products = how_many(input("How many jars?\n"))
+            print(f"Got it. {products} jars of coconut oil")
+            return ['Coconut Oil', products]
+        if choise == '4':
+            products = how_many(input("How many cans?\n"))
+            print(f"Got it. {products} cans of lute")
+            return ['NaOH', products]
+        print("Not a valid input please enter a number 1-4")
+
+def purchases_menu():
+    """
+    prints products and based on choise calls a parent
+    """
+    print(
+        """
+        ---Type of product(s)---
+        1. Current asset 
+        (replenishing stock, every day business expenses, 
+        new items for sale)
+        2. Non-current asset
+        (equipment, other materials that will last for over a year)
         """
         )
     while True:
@@ -213,18 +248,18 @@ def how_many(var):
         else:
             return int(products)
 
-def cash_or_credit(trans_type):
+def cash_or_credit(trans_type: str):
     """
     checks type of transaction
     """
     print(f"--------{trans_type}s--------\n1. Credit {trans_type}\n\2. Cash {trans_type}\n")
     while True:
-        choise = input(f"Choose type of {trans_type}: \n")
+        choise = input(f"Choose type of {trans_type.lower()}: \n")
         if choise == '1':
-            print(f'Chose credit {trans_type} \n')
+            print(f'Chose credit {trans_type.lower()} \n')
             return 1
         if choise == '2':
-            print(f'Chose cash {trans_type}')
+            print(f'Chose cash {trans_type.lower()}')
             return 2
         print("Not a valid input please enter a number 1-3")
 
@@ -294,7 +329,63 @@ def get_gross_total(product: str, amount: int):
     }
     return int(product_prices.get(product) * amount)
 
-def write_cr_transaction(details: list, date: str, customer: list):
+def write_cr_sale(details: list, date: str, customer: list):
+    """passes transaction data to append_data
+
+    Args:
+        details (list): [product name, amount]
+        date (str): transaction date
+        customer (list): [customer name, account number]
+    """
+    print('Writing transaction data...')
+    product = details[0]
+    amount = details[1]
+    gross = get_gross_total(product, amount)
+    account_no = customer[1]
+    name = customer[0]
+    trans_id = f"SC{gen_rand_list(3)}"
+    inv_no = f"INV{gen_rand_list(2)}"
+    sales_append_ls = [
+    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
+    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
+    [RECEIVABLES, name, ['Invoice', gross, inv_no]],
+    [ACCOUNTS, 'sdb', [f"{date[0]}.{date[1]}", account_no, gross * 0.75, gross * 0.25, gross]],
+    [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
+    ]
+    for data in sales_append_ls:
+        data_index = sales_append_ls.index(data) + 1
+        list_length = len(sales_append_ls)
+        print(f"Writing data ({data_index}/{list_length}")
+        append_data(data)
+
+def write_dr_sale(details: list, date: str):
+    """passes transaction data to append_data
+
+    Args:
+        details (list): product name, amount
+        date (str): transaction date
+    """
+    print('Writing transaction data...')
+    product = details[0]
+    amount = details[1]
+    gross = get_gross_total(product, amount)
+    trans_id = f"SD{gen_rand_list(3)}"
+    sales_append_ls = [
+        [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
+        [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
+        [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
+        [ACCOUNTS, 'cash', [f"{date[0]}.{date[1]}", 'sales', trans_id, gross]],
+        [STOCK, product, [f"{date[0]}.{date[1]}", '', amount, gross, gross/amount]]
+    ]
+    bar = FillingCirclesBar('Writing data', max=5)
+    for data in sales_append_ls:
+        # data_index = sales_append_ls.index(data) + 1
+        # list_length = len(sales_append_ls) + 1
+        # print(f"Writing data ({data_index}/{list_length}")
+        append_data(data)
+        bar.next()
+
+def write_cr_purchase(details: list, date: str, customer: list):
     """passes transaction data to append_data
 
     Args:
@@ -323,7 +414,7 @@ def write_cr_transaction(details: list, date: str, customer: list):
         print(f"Writing data ({data_index}/{list_length}")
         append_data(data)
 
-def write_dr_transaction(details: list, date: str):
+def write_dr_purchase(details: list, date: str):
     """passes transaction data to append_data
 
     Args:

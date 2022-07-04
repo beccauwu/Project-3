@@ -1,6 +1,6 @@
 import gspread
 from google.oauth2.service_account import Credentials
-from funcs import product_menu, get_date, cash_or_credit, choose_customer, write_cr_transaction, write_dr_transaction
+from funcs import product_menu, purchases_menu, get_date, cash_or_credit, choose_customer, write_cr_sale, write_dr_sale, write_cr_purchase, write_dr_purchase
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -60,12 +60,12 @@ def sale():
     """
     details = product_menu()
     date = get_date()
-    trans_type = cash_or_credit()
+    trans_type = cash_or_credit('Sale')
     if trans_type == 1:
         customer = choose_customer()
-        write_cr_transaction(details, date, customer)
+        write_cr_sale(details, date, customer)
     elif trans_type == 2:
-        write_dr_transaction(details, date)
+        write_dr_sale(details, date)
 
 
 
@@ -73,28 +73,15 @@ def purchase():
     """
     Menu for accounting purchases
     """
-    print("""
-                --------Purchases--------
-                1. Credit purchase\n\
-                2. Cash purchase\n\
-                3. Back to menu\n\
-                    """)
-    while True:
-        choise = input("Choose an option: \n")
-        if choise == '1':
-            credit_purchase()
-            print("\033c")
-            break
-        elif choise == '2':
-            cash_purchase()
-            print("\033c")
-            break
-        elif choise == '3':
-            start()
-            print("\033c")
-            break
-        else:
-            print("Not a valid input please enter a number 1-3")
+    details = purchases_menu()
+    date = get_date()
+    trans_type = cash_or_credit('Sale')
+    if trans_type == 1:
+        customer = choose_customer()
+        write_cr_purchase(details, date, customer)
+    elif trans_type == 2:
+        write_dr_purchase(details, date)
+
 def reconciliation():
     """
     Menu for reconciling accounts
