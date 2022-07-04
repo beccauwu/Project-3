@@ -371,20 +371,14 @@ def write_dr_sale(details: list, date: str):
     amount = details[1]
     gross = get_gross_total(product, amount)
     trans_id = f"SD{gen_rand_list(3)}"
-    sales_append_ls = [
+    data_ls = [
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
         [ACCOUNTS, 'cash', [f"{date[0:2]}.{date[2:4]}", 'sales', trans_id, gross]],
         [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
     ]
-    progress_bar = FillingCirclesBar('Writing data', max=5)
-    for data in sales_append_ls:
-        # data_index = sales_append_ls.index(data) + 1
-        # list_length = len(sales_append_ls) + 1
-        # print(f"Writing data ({data_index}/{list_length}")
-        append_data(data)
-        progress_bar.next()
+    append_data(data_ls)
 
 def write_cr_purchase(details: list, date: str, customer: list):
     """passes transaction data to append_data
@@ -402,18 +396,14 @@ def write_cr_purchase(details: list, date: str, customer: list):
     name = customer[0]
     trans_id = f"SC{gen_rand_list(3)}"
     inv_no = f"INV{gen_rand_list(2)}"
-    sales_append_ls = [
+    data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
     [RECEIVABLES, name, ['Invoice', gross, inv_no]],
     [ACCOUNTS, 'sdb', [f"{date[0:2]}.{date[2:4]}", account_no, gross * 0.75, gross * 0.25, gross]],
     [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
     ]
-    for data in sales_append_ls:
-        data_index = sales_append_ls.index(data) + 1
-        list_length = len(sales_append_ls) + 1
-        print(f"Writing data ({data_index}/{list_length}")
-        append_data(data)
+    append_data(data_ls)
 
 def write_dr_purchase(details: list, date: str):
     """passes transaction data to append_data
@@ -427,15 +417,11 @@ def write_dr_purchase(details: list, date: str):
     amount = details[1]
     gross = get_gross_total(product, amount)
     trans_id = f"SD{gen_rand_list(3)}"
-    sales_append_ls = [
+    data_ls = [
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
         [ACCOUNTS, 'cash', [f"{date[0:2]}.{date[2:4]}", 'sales', trans_id, gross]],
         [STOCK, product, [f"{date[0:2]}.{date[2:4]}", '', amount, gross, gross/amount]]
     ]
-    for data in sales_append_ls:
-        data_index = sales_append_ls.index(data) + 1
-        list_length = len(sales_append_ls) + 1
-        print(f"Writing data ({data_index}/{list_length}")
-        append_data(data)
+    append_data(data_ls)
