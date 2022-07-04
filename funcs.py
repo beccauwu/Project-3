@@ -182,18 +182,22 @@ def product_menu():
         if choise == '1':
             products = how_many(input("How many soap bars?\n"))
             print(f"Got it. {products} bars of soap")
+            print("\033c")
             return ['Soap Bar', products]
         if choise == '2':
             products = how_many(input("How many bottles"))
             print(f"Got it. {products} bottles of soap")
+            print("\033c")
             return ['Liquid Soap', products]
         if choise == '3':
             products = how_many(input("How many jars?\n"))
             print(f"Got it. {products} jars of coconut oil")
+            print("\033c")
             return ['Coconut Oil', products]
         if choise == '4':
             products = how_many(input("How many cans?\n"))
             print(f"Got it. {products} cans of lute")
+            print("\033c")
             return ['NaOH', products]
         print("Not a valid input please enter a number 1-4")
 
@@ -288,11 +292,45 @@ def check_if_date(date):
         boolean: True if is correct format,
         False if not
     """
+    #correct length?
     if len(date) == 4:
-        return True
-    print(len(date))
-    print('The entered date is invalid')
-    print('Please try again')
+        #if uneven month, see if value of days is less than 32
+        if int(date[1]) % 2 != 0:
+            try:
+                int(date[2:4]) < 32
+            except ValueError as val_err:
+                print(f'The month entered does not have {val_err} days.')
+                print('Please try again.')
+                return False
+        #if even month see if value of days is less than 31
+        elif int(date[1]) % 2 == 0:
+            try:
+                int(date[2:3]) < 31
+            except ValueError as val_err:
+                print(f'The month entered does not have {val_err} days.')
+                print('Please try again.')
+                return False
+        #if february see if value of days less than 30
+        #idk how to check for leap years yet
+        elif date[0:2] == '02':
+            try:
+                int(date[2:4]) < 30
+            except ValueError as val_err:
+                print(f'The month entered does not have {val_err} days.')
+                print('Please try again.')
+                return False
+        #check that month number is less than 13
+        try:
+            int(date[0:2]) < 13
+        except ValueError as val_err:
+            print(f"There isn't a month number {val_err}.")
+            print('Please try again.')
+            return False
+        else:
+            return True
+    print(f"The date entered ({date}) is not of correct format (DDMM),")
+    print(f"you have entered {len(date)} characters instead of 4.")
+    print('Please try again.')
     return False
 
 def sales_trans_id(var):
