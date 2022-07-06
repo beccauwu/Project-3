@@ -3,3 +3,4 @@ gspread
 google-oauth
 progress
 reportlab
+collections
