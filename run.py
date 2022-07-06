@@ -37,7 +37,6 @@ def start():
 
 
 
-
 def sale():
     """
     Menu for accounting sales

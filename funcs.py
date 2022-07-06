@@ -17,6 +17,7 @@ ACCOUNTS = GSPREAD_CLIENT.open('accounts')
 PAYABLES = GSPREAD_CLIENT.open('payables')
 RECEIVABLES = GSPREAD_CLIENT.open('receivables')
 GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
+INDEX = GSPREAD_CLIENT.open('index')
 STOCK = GSPREAD_CLIENT.open('stock')
 
 def choose_customer():
@@ -26,6 +27,7 @@ def choose_customer():
         list: [Customer name, account no]
     """
     existing_customers = get_worksheet_titles(RECEIVABLES)
+    last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
     num = 1
     for customer in existing_customers:
         print(num, '', customer)
@@ -35,7 +37,8 @@ def choose_customer():
         print("If adding a new customer, press 'n'\n")
         if choise == 'n':
             name = input('Customer name:')
-            new = new_worksheet(RECEIVABLES, name)
+            new = new_account_number(last_account_no)
+            new_worksheet(RECEIVABLES, name, new)
             return [name, new]
         try:
             int(choise) < len(existing_customers)
@@ -77,18 +80,19 @@ def choose_supplier():
             print(f"{existing_suppliers[choise - 1]} chosen. Proceeding.")
             return [existing_suppliers[choise - 1], account_no]
 
-def new_worksheet(spreadsheet, title):
+def new_worksheet(spreadsheet, title, code):
     """creates a new worksheet using a base template
 
     Args:
         spreadheet (const): spreadsheet to add to
         title (str): new worksheet title
+        code (str): value of A1
     """
     new_sheet = spreadsheet.duplicate_sheet('Base')
     new_sheet.update_title(title)
-    new_sheet.update('A1')
+    new_sheet.update('A1', code)
 
-def new_rl_account_number(ssh):
+def new_account_number(last):
     """Gets a new account number for new worksheets
 
     Args:
@@ -97,13 +101,11 @@ def new_rl_account_number(ssh):
     Returns:
         int: new number
     """
-    print('Generating account number...')
-    wsh_list = [wsh.title for wsh in ssh]
-    cell_a1 = get_cell_val(RECEIVABLES, wsh_list[-1], 'A1')
-    num = int(''.join(c for c in cell_a1 if c.isdigit()))
+    code = last[0:2]
+    num = int(''.join(c for c in last if c.isdigit()))
     num += 10
     print(f"New account number is: RL{num}")
-    return f"RL{num}"
+    return f"{code}{num}"
 
 def get_cell_val(ssh, wsh, cell):
     """Gets cell value from worksheet
@@ -360,6 +362,60 @@ def get_gross_total(product: str, amount: int):
     }
     return int(product_prices.get(product) * amount)
 
+def get_trans_id(ttype: str):
+    """Generates a new transaction ID
+    and appends it to index of IDs
+
+    Args:
+        ttype (str): beginning of id
+        identifies transaction type
+
+    Returns:
+        str: new transaction id
+    """
+    index_of = INDEX.worksheet('transactions')
+    old_trans_ids = index_of.col_values(1)
+    while True:
+        trans_id = f"{ttype}{str(gen_rand_list(3))}"
+        if not is_item_in_list(old_trans_ids, trans_id):
+            index_of.append_row([trans_id])
+            return trans_id
+
+def get_inv_id():
+    """Generates a new invoice ID
+    and appends it to index of IDs
+
+    Args:
+        ttype (str): beginning of id
+        identifies transaction type
+
+    Returns:
+        str: new transaction id
+    """
+    index_of = INDEX.worksheet('invoices')
+    old_inv_ids = index_of.col_values(1)
+    while True:
+        inv_id = f"INV{str(gen_rand_list(3))}"
+        if not is_item_in_list(old_inv_ids, inv_id):
+            index_of.append_row([inv_id])
+            return inv_id
+
+def is_item_in_list(lst, item):
+    """Checks an item against an index of list
+
+    Args:
+        lst (list): list to index
+        item (any): item to check
+
+    Returns:
+        boolean: True if it exists,
+        False if not
+    """
+    for i in lst:
+        if str(item) != str(i):
+            return False
+    return True
+
 def write_cr_sale(details: list, date: str, customer: list):
     """passes transaction data to append_data
 
@@ -374,7 +430,7 @@ def write_cr_sale(details: list, date: str, customer: list):
     gross = get_gross_total(product, amount)
     account_no = customer[1]
     name = customer[0]
-    trans_id = f"SC{str(gen_rand_list(3))}"
+    trans_id = get_trans_id('SC')
     inv_no = f"INV{str(gen_rand_list(2))}"
     data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
