@@ -1,9 +1,11 @@
 from collections import namedtuple
+from io import BytesIO
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import ParagraphStyle
+from flask.helpers import send_file
 
 Creator = namedtuple("Creator", ["name", "email", "phone_num",
                                  "address", "city", "country", "vat_reg_no"])
@@ -49,9 +51,10 @@ footer_second = ParagraphStyle('footer',
                                 fontSize=8,
                                 alignment=TA_CENTER)
 
+buffer = BytesIO()
+
 def generate_pdf(date, filename, vat_no, tbl_one, tbl_two):
     """Generates an invoice as pdf from data provided
-
     Args:
         date (str): invoice date
         filename (str): invoice filename
@@ -83,9 +86,10 @@ def generate_pdf(date, filename, vat_no, tbl_one, tbl_two):
         pdf_content.append(main)
     for footer in footers:
         pdf_content.append(footer)
-    SimpleDocTemplate(filename, pagesize=A4,
+    SimpleDocTemplate(buffer, pagesize=A4,
                         rightMargin=12, leftMargin=12,
                         topMargin=12, bottomMargin=6).build(pdf_content)
+    send_file(buffer, as_attachment=True, mimetype='application/pdf', attachment_filename=filename)
 
 def sort_data(orders:list, date, inv_num, ref_num, name, address):
     """
@@ -135,7 +139,7 @@ def set_invoice_data_private(itm, amount, gross):
     return inv_data
 
 def set_invoice_data_business(amount, itm, gross):
-    """sets invoice data for business purchases - 
+    """sets invoice data for business purchases -
     checks if business is excempt from vat and adjusts amounts
     accordingly
 
@@ -192,7 +196,6 @@ def vat_excempt():
             print('Customer is not VAT excempt.')
             return False
         print('Invalid choise, please try again')
-
 
 def create_content(pdf_invoice_obj, itms:list):
     """creates tables for invoice based on ordered items

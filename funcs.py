@@ -60,6 +60,7 @@ def choose_supplier():
         list: [Supplier name, account no]
     """
     existing_suppliers = get_worksheet_titles(PAYABLES)
+    last_account_no = PAYABLES.worksheet(existing_suppliers[- 1]).acell('A1').value
     num = 1
     for supplier in existing_suppliers:
         print(num, '', supplier)
@@ -69,7 +70,8 @@ def choose_supplier():
         print("If adding a new supplier, press 'n'\n")
         if choise == 'n':
             name = input('Supplier name:')
-            new = new_worksheet(PAYABLES, name)
+            new = new_account_number(last_account_no)
+            new_worksheet(PAYABLES, name, new)
             return [name, new]
         try:
             int(choise) < len(existing_suppliers)
@@ -220,7 +222,7 @@ def how_many_items():
             items.append(product_menu())
             int_choise -= 1
         return items
-            
+
 
 def purchases_menu():
     """
@@ -395,10 +397,10 @@ def get_trans_id(ttype: str):
     index_of = INDEX.worksheet('transactions')
     old_trans_ids = index_of.col_values(1)
     while True:
-        trans_id = f"{ttype}{str(gen_rand_list(3))}"
+        trans_id = f"{ttype}{str(gen_rand_list(7))}"
         if not is_item_in_list(old_trans_ids, trans_id):
             index_of.append_row([trans_id])
-            return trans_id
+        return trans_id
 
 def get_inv_id():
     """Generates a new invoice ID
@@ -455,10 +457,11 @@ def write_cr_sale(details: list, date: str, customer: list):
         #grosses.append(gross)
         #stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
     #gross_total = sum(grosses)
+    print(gross_total)
     account_no = customer[1]
-    name = customer[0]
     trans_id = get_trans_id('SC')
     inv_no = f"INV{str(gen_rand_list(2))}"
+    print(inv_no)
     data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross_total]],
