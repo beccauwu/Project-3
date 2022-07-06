@@ -48,10 +48,10 @@ def choose_customer():
         else:
             customer = existing_customers[choise - 1]
             account_no = RECEIVABLES.worksheet(customer).acell('A1').value
-            address_row = INDEX.worksheet('addresses').find(customer).row
-            address = INDEX.worksheet('addresses').row_values(address_row)
+            #address_row = INDEX.worksheet('addresses').find(customer).row
+            #address = INDEX.worksheet('addresses').row_values(address_row)
             print(f"{customer} chosen. Proceeding.")
-            return [customer, account_no, address]
+            return [customer, account_no]
 
 def choose_supplier():
     """Show existing suppliers and add new if not in list
@@ -439,20 +439,22 @@ def write_cr_sale(details: list, date: str, customer: list):
     """passes transaction data to append_data
 
     Args:
-        details (list): [[product name, amount]]
+        details (list): [product name, amount]
         date (str): transaction date
         customer (list): [customer name, account number]
     """
     print('Writing transaction data...')
-    grosses = []
-    stock_itms = []
-    for prod in details:
-        product = prod[0]
-        amount = prod[1]
-        gross = get_gross_total(product, amount)
-        grosses.append(gross)
-        stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
-    gross_total = sum(grosses)
+    product = details[0]
+    amount = details[1]
+    gross_total = get_gross_total(product, amount)
+    #stock_itms = []
+    #for prod in details:
+        #product = prod[0]
+        #amount = prod[1]
+        #gross = get_gross_total(product, amount)
+        #grosses.append(gross)
+        #stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
+    #gross_total = sum(grosses)
     account_no = customer[1]
     name = customer[0]
     trans_id = get_trans_id('SC')
@@ -460,13 +462,14 @@ def write_cr_sale(details: list, date: str, customer: list):
     data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross_total]],
-    [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [date, account_no, gross * 0.75, gross * 0.25, gross_total]]
+    [RECEIVABLES, name, ['Invoice', gross_total, inv_no]],
+    [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total]],
+    [STOCK, product, [date, '', amount, gross_total, gross_total/amount]]
     ]
-    for itm in stock_itms:
-        data_ls.append(itm)
+    #for itm in stock_itms:
+        #data_ls.append(itm)
     append_data(data_ls)
-    return [inv_no, trans_id]
+    #return [inv_no, trans_id]
 
 
 def write_dr_sale(details: list, date: str):

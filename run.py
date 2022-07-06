@@ -42,13 +42,13 @@ def sale():
     """
     Menu for accounting sales
     """
-    details = how_many_items()
+    details = product_menu()
     date = get_date()
     trans_type = cash_or_credit('Sale')
     if trans_type == 1:
         customer = choose_customer()
-        nums = write_cr_sale(details, date, customer[0:2])
-        sort_data(details, date, nums[0], nums[1], customer[0], customer[2][1:5])
+        write_cr_sale(details, date, customer)
+        #sort_data(details, date, nums[0], nums[1], customer[0], customer[2][1:5])
 
     elif trans_type == 2:
         write_dr_sale(details, date)
