@@ -4,11 +4,6 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import ParagraphStyle
-from gcloud import storage
-from funcs import CREDS
-
-CLIENT = storage.Client(credentials=CREDS, project='accountspy')
-BUCKET = CLIENT.get_bucket('accountspy-invoices')
 
 Creator = namedtuple("Creator", ["name", "email", "phone_num",
                                  "address", "city", "country", "vat_reg_no"])
@@ -92,7 +87,7 @@ def generate_pdf(date, filename, vat_no, tbl_one, tbl_two):
                         rightMargin=12, leftMargin=12,
                         topMargin=12, bottomMargin=6).build(pdf_content)
 
-def sort_data(orders:list, date, inv_num, ref_num):
+def sort_data(orders:list, date, inv_num, ref_num, name, address):
     """
     creates list with ordered items and their attributes, passes
     them then onto create_content
@@ -100,7 +95,7 @@ def sort_data(orders:list, date, inv_num, ref_num):
     items = []
     creator = Creator('Test User', 'test@gmail.com', '098912312',
                       '123 Test road', 'TestCity', 'TestCountry', 'SE00000000001')
-    customer = Customer('Test Customer', '15 Test Road', 'City','WA2 3FA', 'country')
+    customer = Customer(name, address[0], address[1], address[2], address[3])
     file = File("Invoice.pdf", 12, 5)
     print("""
           ---Customer Type---
@@ -282,8 +277,3 @@ def set_table_styles(tbl, tbl_two, rowheights):
             bg_color = colors.lightgrey
         t2.setStyle(TableStyle([('BACKGROUND', (0, each), (-1, each), bg_color)]))
     return t, t2
-
-
-
-sort_data([['da best item', 4, 50],
-           ['another item', 3, 20]], '20.12.2053', 'INV-2222', 712368487312)

@@ -3,7 +3,6 @@ from random import randint
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
-
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -47,9 +46,12 @@ def choose_customer():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
-            account_no = RECEIVABLES.worksheet(existing_customers[choise - 1]).acell('A1').value
-            print(f"{existing_customers[choise - 1]} chosen. Proceeding.")
-            return [existing_customers[choise - 1], account_no]
+            customer = existing_customers[choise - 1]
+            account_no = RECEIVABLES.worksheet(customer).acell('A1').value
+            address_row = INDEX.worksheet('addresses').find(customer).row
+            address = INDEX.worksheet('addresses').row_values(address_row)
+            print(f"{customer} chosen. Proceeding.")
+            return [customer, account_no, address]
 
 def choose_supplier():
     """Show existing suppliers and add new if not in list
@@ -202,6 +204,23 @@ def product_menu():
             print("\033c")
             return ['NaOH', products]
         print("Not a valid input please enter a number 1-4")
+
+def how_many_items():
+    """checks how many different items were ordered
+
+    Returns:
+        list: list of items ordered
+    """
+    items = []
+    print('How many items will be added to the invoice?')
+    while True:
+        choise = input('Type any number of products:')
+        int_choise = int(choise)
+        while int_choise > 0:
+            items.append(product_menu())
+            int_choise -= 1
+        return items
+            
 
 def purchases_menu():
     """
@@ -420,26 +439,35 @@ def write_cr_sale(details: list, date: str, customer: list):
     """passes transaction data to append_data
 
     Args:
-        details (list): [product name, amount]
+        details (list): [[product name, amount]]
         date (str): transaction date
         customer (list): [customer name, account number]
     """
     print('Writing transaction data...')
-    product = details[0]
-    amount = details[1]
-    gross = get_gross_total(product, amount)
+    grosses = []
+    stock_itms = []
+    for prod in details:
+        product = prod[0]
+        amount = prod[1]
+        gross = get_gross_total(product, amount)
+        grosses.append(gross)
+        stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
+    gross_total = sum(grosses)
     account_no = customer[1]
     name = customer[0]
     trans_id = get_trans_id('SC')
     inv_no = f"INV{str(gen_rand_list(2))}"
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
-    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
+    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total]],
+    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross_total]],
     [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [date, account_no, gross * 0.75, gross * 0.25, gross]],
-    [STOCK, product, [date, '', amount, gross, gross/amount]]
+    [ACCOUNTS, 'sdb', [date, account_no, gross * 0.75, gross * 0.25, gross_total]]
     ]
+    for itm in stock_itms:
+        data_ls.append(itm)
     append_data(data_ls)
+    return [inv_no, trans_id]
+
 
 def write_dr_sale(details: list, date: str):
     """passes transaction data to append_data
