@@ -4,3 +4,4 @@
 ![receivables ledger](assets/img/rl.png)
 ![trade receivables](assets/img/tr.png)
 ![sales day book](assets/img/sdb.png)
+![invoice](assets/img/inv.png)
