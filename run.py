@@ -64,7 +64,7 @@ def purchase():
     if trans_type == 1:
         supplier = choose_supplier()
         invoice_num = input('Enter the invoice number:')
-        sort_cr_purchase_data(date, supplier[0], supplier[1], net_price, gross_price)
+        sort_cr_purchase_data([date, supplier[0], supplier[1], net_price, gross_price, invoice_num], details)
     elif trans_type == 2:
         write_dr_purchase(details, date)
 

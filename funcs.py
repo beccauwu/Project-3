@@ -460,6 +460,38 @@ def is_item_in_list(lst, item):
             return False
     return True
 
+def make_item_list(date: str, items: list, ttype: int, inv_no= None):
+    """generates a list of products to add to list which is appended to spreadsheets
+
+    Args:
+        date (str): date
+        items (list): [product, amount]
+        ttype (list): transaction type (sale = 1, purchase = 2)
+
+    Returns:
+       list: list with complete data
+    """
+    stock_itms = []
+    ca_itms = []
+    grosses = []
+    ca_status = False
+    for itm in items:
+        product = itm[0]
+        amount = itm[1]
+        gross = float(get_gross_total(product, amount))
+        grosses.append(gross)
+        if ttype == 1:
+            stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
+        if ttype == 2:
+            ca_status = True
+            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount]])
+            ca_itms.append([GENERAL_LEDGER, 'Current Assets', [itm[0], inv_no, float(itm[1])]])    
+    gross_total = float(sum(grosses))
+    print(f"Gross total: {gross_total}")
+    if ca_status:
+        return [stock_itms, ca_itms, gross_total]
+    return [stock_itms, gross_total]
+
 def sort_cr_sale_data(details: list, date: str, customer: list):
     """passes transaction data to append_data
 
@@ -469,19 +501,6 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
         customer (list): [account number, [name, address, city, postcode, country]]
     """
     print('Writing transaction data...')
-    grosses = []
-    stock_itms = []
-    order = []
-    for prod in details:
-        product = prod[0]
-        amount = prod[1]
-        gross = float(get_gross_total(product, amount))
-        grosses.append(gross)
-        stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
-        order.append([product, amount, gross])
-    gross_total = float(sum(grosses))
-    print(f"Gross total: {gross_total}")
-    print(gross_total)
     name = customer[1][0]
     account_no = customer[0]
     address = customer[1][1:5]
@@ -489,13 +508,16 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     inv_no = f"INV{str(gen_rand_list(3))}"
     print(f"Transaction ID: {trans_id}")
     print(f"Invoice number: {inv_no}")
-    data = [name, account_no, gross_total, trans_id, inv_no, date]
-    #for itm in stock_itms:
-        #data_ls.append(itm)
-    write_cr_sale(data, stock_itms)
-    print(order)
+    get_data = make_item_list(date, details, 1)
+    print(f"GetData Complete: {get_data}")
+    data = [name, account_no, get_data[1], trans_id, inv_no, date]
+    order = []
+    for itm in get_data[0]:
+        order.append(itm[1])
+        order.append(itm[2][2])
+        order.append(itm[2][3])
+    write_cr_sale(data, get_data[0])
     sort_data(order, date, inv_no, trans_id, name, address)
-    #return [inv_no, trans_id]
 
 def write_cr_sale(data, stock_list):
     """passes transaction data to append_data
@@ -532,26 +554,17 @@ def write_dr_sale(details: list, date: str):
     product = details[0]
     amount = details[1]
     gross = get_gross_total(product, amount)
-    trans_id = f"SD{gen_rand_list(3)}"
+    trans_id = get_trans_id('SD')
+    get_data = make_item_list(date, data[0], 1)
     data_ls = [
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
         [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
-        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]],
-        [STOCK, product, [date, '', amount, gross, gross/amount]]
+        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]]
     ]
+    for itm in get_data[0]:
+        data_ls.append(itm)
     append_data(data_ls)
-
-def sort_cr_purchase_data(data):
-    """sorts purchase data and passes it to write_data
-
-    Args:
-        data (list): data: [date, name, account number, net total, gross total]
-    """
-    item_list = []
-    for itm in items:
-        item_list.append(itm)
-    write_cr_purchase(item_list, data)
 
 def write_cr_purchase(itms, data):
     """passes transaction data to append_data
@@ -565,6 +578,7 @@ def write_cr_purchase(itms, data):
     gross = price[1]
     account_no = supplier[1]
     name = supplier[0]
+    get_data = make_item_list(date, itms, 2, inv_no)
     data_ls = [
     [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', account_no, gross]],
@@ -572,7 +586,9 @@ def write_cr_purchase(itms, data):
     [ACCOUNTS, 'sdb', [date, account_no, price[0], float(price[1])-float(price[0]), gross]]
     ]
     for itm in itms:
-        data_ls.append([GENERAL_LEDGER, 'Current Assets', [itm[0], inv_no, float(itm[1])]])
+        data_ls.append()
+    for item in get_data[0]:
+        data_ls.append(item)
     append_data(data_ls)
 
 def write_dr_purchase(details: list, date: str):
