@@ -235,8 +235,8 @@ def purchases_menu():
     print(
         """
         ---Type of product(s)---
-        1. Current asset 
-        (replenishing stock, every day business expenses, 
+        1. Current asset
+        (replenishing stock, every day business expenses,
         new items for sale)
         2. Non-current asset
         (equipment, other materials that will last for over a year)
@@ -245,22 +245,41 @@ def purchases_menu():
     while True:
         choise = input("Choose an option: \n")
         if choise == '1':
-            products = how_many(input("How many soap bars?\n"))
-            print(f"Got it. {products} bars of soap")
-            return ['Soap Bar', products]
+            products = no_of_products(1)
+            return products
         if choise == '2':
-            products = how_many(input("How many bottles"))
-            print(f"Got it. {products} bottles of soap")
-            return ['Liquid Soap', products]
-        if choise == '3':
-            products = how_many(input("How many jars?\n"))
-            print(f"Got it. {products} jars of coconut oil")
-            return ['Coconut Oil', products]
-        if choise == '4':
-            products = how_many(input("How many cans?\n"))
-            print(f"Got it. {products} cans of lute")
-            return ['NaOH', products]
-        print("Not a valid input please enter a number 1-4")
+            products = no_of_products(2)
+            return products
+        print("Not a valid input please enter a number 1-2")
+
+def no_of_products(num):
+    items = []
+    print('Did you buy several products?')
+    if num == 1:
+        while True:
+            choise = input('Type the amount of different products you bought:')
+            if not int(choise):
+                raise TypeError(f'Value entered ({choise}) is not valid.')
+            else:
+                int_choise_static = int(choise)
+                order = 1
+                int_choise = int(choise)
+                while int_choise > 0:
+                    if num == 1:
+                        items.append(product_menu())
+                        int_choise -= 1
+                        order +=1
+                        return items
+                    items.append(enter_products(order, int_choise_static))
+                    int_choise -= 1
+                    order +=1
+                    return items
+
+def enter_products(num1, num2):
+    print(f'What product did you buy ({num1}/{num2})')
+    product = input('Enter product description:')
+    price = input('Enter the net value of the product:')
+    return [product, price]
 
 def how_many(var):
     """prompts for an amount of something
@@ -477,6 +496,7 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     print(order)
     sort_data(order, date, inv_no, trans_id, name, address)
     #return [inv_no, trans_id]
+
 def write_cr_sale(data, stock_list):
     """passes transaction data to append_data
 
@@ -494,7 +514,6 @@ def write_cr_sale(data, stock_list):
     date = data[5]
     data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total]],
-    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross_total]],
     [RECEIVABLES, name, ['Invoice', gross_total, inv_no]],
     [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total]]
     ]
@@ -523,7 +542,18 @@ def write_dr_sale(details: list, date: str):
     ]
     append_data(data_ls)
 
-def write_cr_purchase(details: list, date: str, customer: list):
+def sort_cr_purchase_data(data):
+    """sorts purchase data and passes it to write_data
+
+    Args:
+        data (list): data: [date, name, account number, net total, gross total]
+    """
+    item_list = []
+    for itm in items:
+        item_list.append(itm)
+    write_cr_purchase(item_list, data)
+
+def write_cr_purchase(itms, data):
     """passes transaction data to append_data
 
     Args:
@@ -532,20 +562,17 @@ def write_cr_purchase(details: list, date: str, customer: list):
         customer (list): [customer name, account number]
     """
     print('Writing transaction data...')
-    product = details[0]
-    amount = details[1]
-    gross = get_gross_total(product, amount)
-    account_no = customer[1]
-    name = customer[0]
-    trans_id = f"SC{gen_rand_list(3)}"
-    inv_no = f"INV{gen_rand_list(2)}"
+    gross = price[1]
+    account_no = supplier[1]
+    name = supplier[0]
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross]],
-    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross]],
+    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross]],
+    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', account_no, gross]],
     [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [date, account_no, gross * 0.75, gross * 0.25, gross]],
-    [STOCK, product, [date, '', amount, gross, gross/amount]]
+    [ACCOUNTS, 'sdb', [date, account_no, price[0], float(price[1])-float(price[0]), gross]]
     ]
+    for itm in itms:
+        data_ls.append([GENERAL_LEDGER, 'Current Assets', [itm[0], inv_no, float(itm[1])]])
     append_data(data_ls)
 
 def write_dr_purchase(details: list, date: str):

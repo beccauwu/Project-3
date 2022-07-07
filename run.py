@@ -46,7 +46,6 @@ def sale():
     if trans_type == 1:
         customer = choose_customer()
         sort_cr_sale_data(details, date, customer)
-        #sort_data(details, date, nums[0], nums[1], customer[0], customer[2][1:5])
 
     elif trans_type == 2:
         write_dr_sale(details, date)
@@ -59,10 +58,13 @@ def purchase():
     """
     details = purchases_menu()
     date = get_date()
-    trans_type = cash_or_credit('Sale')
+    trans_type = cash_or_credit('Purchase')
+    net_price = input('Enter the net price of purchase:')
+    gross_price = input('Enter the gross price of purchase:')
     if trans_type == 1:
-        customer = choose_customer()
-        write_cr_purchase(details, date, customer)
+        supplier = choose_supplier()
+        invoice_num = input('Enter the invoice number:')
+        sort_cr_purchase_data(date, supplier[0], supplier[1], net_price, gross_price)
     elif trans_type == 2:
         write_dr_purchase(details, date)
 

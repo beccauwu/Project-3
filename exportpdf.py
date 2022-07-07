@@ -8,8 +8,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import ParagraphStyle
 from flask.helpers import send_file
 
-Creator = namedtuple("Creator", ["name", "email", "phone_num",
-                                 "address", "city", "country", "vat_reg_no"])
+Creator = namedtuple("Creator", ["name", "email", "phone_num", "account", "vat_reg_no"])
 Customer = namedtuple("Customer", ["name", "address", "city", "postcode", "country"])
 File = namedtuple("File", ["filename", "font_size", "line_height"])
 InvData = namedtuple("InvData", ["amount", "itm", "gross_total",
@@ -18,6 +17,7 @@ PdfInvoice = namedtuple("PdfInvoice", ["date", "due", "invoice_num",
                                        'reference_num', "creator", "customer", "file"])
 Row1 = namedtuple('Row1', ['col1', 'col2', 'col3', 'col4'])
 Row2 = namedtuple('Row2', ['col1', 'col2', 'col3', 'col4', 'col5', 'col6'])
+Row3 = namedtuple('Row2', ['col1'])
 
 title_style = ParagraphStyle('title',
                                 fontName='Helvetica-Bold',
@@ -52,7 +52,7 @@ footer_second = ParagraphStyle('footer',
                                 fontSize=8,
                                 alignment=TA_CENTER)
 
-def generate_pdf(date, filename, vat_no, tbl_one, tbl_two):
+def generate_pdf(invoice_num, filename, vat_no, tbl_one, tbl_two, summary, sammount):
     """Generates an invoice as pdf from data provided
     Args:
         date (str): invoice date
@@ -61,18 +61,24 @@ def generate_pdf(date, filename, vat_no, tbl_one, tbl_two):
         tbl_one (list): table containing the first information on document
         tbl_two (list): table containing purchase information
     """
-    space = Spacer(1, 20)
     pdf_content = []
     headers = [
         Paragraph("INVOICE", title_style),
         Spacer(1, 2),
-        date,
-        space
+        invoice_num,
+        Spacer(1, 20)
     ]
     main_contents = [
         tbl_one,
-        space,
-        tbl_two
+        Spacer(1, 20),
+        tbl_two,
+        summary[0][0],
+        summary[0][1],
+        summary[1][0],
+        summary[1][1],
+        summary[2][0],
+        summary[2][1],
+        Spacer(1, sammount)
     ]
     footers = [
         Paragraph("E&OE", footer_first),
@@ -96,10 +102,9 @@ def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     them then onto create_content
     """
     items = []
-    creator = Creator('Test User', 'test@gmail.com', '098912312',
-                      '123 Test road', 'TestCity', 'TestCountry', 'SE00000000001')
+    creator = Creator('Test User', 'test@gmail.com', '098912312','DE1921 3210 9381 8211', 'SE00000000001')
     customer = Customer(name, address[0], address[1], address[2], address[3])
-    file = File(f"{inv_num}.pdf", 12, 5)
+    file = File("Invoice.pdf", 12, 5)
     print("""
           ---Customer Type---
           1. Private
@@ -204,16 +209,17 @@ def create_content(pdf_invoice_obj, itms:list):
         pdf_invoice_obj (var): PdfInvoice namedtuple
         itms (var): InvData namedtuple for each item
     """
-    date = Paragraph(f"{pdf_invoice_obj.date}", small_style)
+    inv_num = Paragraph(f"{pdf_invoice_obj.invoice_num}", small_style)
     filename = pdf_invoice_obj.file.filename
     vat_no = f"{pdf_invoice_obj.creator.vat_reg_no}"
     nets = []
     grosses = []
     taxes = []
-    rh = [20, 20]
+    space = 400
+    rh = [[20, 20], [20, 20, 20, 20, 20, 20, 20]]
     tbl1 = [
-        Row1(Paragraph("For your reference:", bold_style),
-             Paragraph(f"{pdf_invoice_obj.invoice_num}", normal_style), "",
+        Row1(Paragraph("date:", bold_style),
+             Paragraph(f"{pdf_invoice_obj.date}", normal_style), "",
              Paragraph(f"{pdf_invoice_obj.customer.name}")),
         Row1(Paragraph("For our reference:", bold_style),
             Paragraph(f"{pdf_invoice_obj.reference_num}", normal_style), "",
@@ -232,8 +238,17 @@ def create_content(pdf_invoice_obj, itms:list):
             Paragraph("Net (€)", price_bold), 
             Paragraph("Gross (€)", price_bold)),
     ]
+    summary = [
+        [Paragraph(f"Total due by {pdf_invoice_obj.due}:", price_bold),
+        Paragraph(f"{sum(grosses)}", price_normal)],
+        [Paragraph("To account:", price_bold),
+        Paragraph(f"{pdf_invoice_obj.creator.account}", price_normal)],
+        [Paragraph("Use reference:", price_bold),
+        Paragraph(f"{pdf_invoice_obj.invoice_num}", price_normal)]
+    ]
     for itm in itms:
         rh.append(20)
+        space -= 20
         nets.append(float(itm.net_total))
         taxes.append(float(itm.vat))
         grosses.append(float(itm.gross_total))
@@ -255,7 +270,7 @@ def create_content(pdf_invoice_obj, itms:list):
         Paragraph(f"{sum(grosses)}", price_bold))
     )
     tstyles = set_table_styles(tbl1, tbl2, rh)
-    generate_pdf(date, filename, vat_no, tstyles[0], tstyles[1])
+    generate_pdf(inv_num, filename, vat_no, tstyles[0], tstyles[1], summary, space)
 
 def set_table_styles(tbl, tbl_two, rowheights):
     """sets styling for tables in invoice
@@ -269,7 +284,7 @@ def set_table_styles(tbl, tbl_two, rowheights):
         tuple: styled tables
     """
     t = Table(tbl, colWidths=[110, 100, 150, 170], rowHeights=[40, 15, 15, 15, 40], vAlign='LEFT')
-    t2 = Table(tbl_two, colWidths=[130, 70, 70, 70, 70, 70], rowHeights=rowheights, vAlign='LEFT')
+    t2 = Table(tbl_two, colWidths=[130, 70, 70, 70, 70, 70], rowHeights=rowheights[0], vAlign='LEFT')
     t2.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.25, colors.black),
                            ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.black)]))
     data_len = len(tbl_two)
@@ -279,4 +294,4 @@ def set_table_styles(tbl, tbl_two, rowheights):
         else:
             bg_color = colors.lightgrey
         t2.setStyle(TableStyle([('BACKGROUND', (0, each), (-1, each), bg_color)]))
-    return t, t2
+    return t, t2, t3
