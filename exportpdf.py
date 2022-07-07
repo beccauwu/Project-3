@@ -1,3 +1,4 @@
+import webbrowser
 from collections import namedtuple
 from io import BytesIO
 from reportlab.lib import colors
@@ -51,8 +52,6 @@ footer_second = ParagraphStyle('footer',
                                 fontSize=8,
                                 alignment=TA_CENTER)
 
-buffer = BytesIO()
-
 def generate_pdf(date, filename, vat_no, tbl_one, tbl_two):
     """Generates an invoice as pdf from data provided
     Args:
@@ -86,12 +85,12 @@ def generate_pdf(date, filename, vat_no, tbl_one, tbl_two):
         pdf_content.append(main)
     for footer in footers:
         pdf_content.append(footer)
-    SimpleDocTemplate(buffer, pagesize=A4,
+    SimpleDocTemplate(filename, pagesize=A4,
                         rightMargin=12, leftMargin=12,
                         topMargin=12, bottomMargin=6).build(pdf_content)
-    send_file(buffer, as_attachment=True, mimetype='application/pdf', attachment_filename=filename)
+    webbrowser.open_new(filename)
 
-def sort_data(orders:list, date, inv_num, ref_num, name, address):
+def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     """
     creates list with ordered items and their attributes, passes
     them then onto create_content
@@ -100,7 +99,7 @@ def sort_data(orders:list, date, inv_num, ref_num, name, address):
     creator = Creator('Test User', 'test@gmail.com', '098912312',
                       '123 Test road', 'TestCity', 'TestCountry', 'SE00000000001')
     customer = Customer(name, address[0], address[1], address[2], address[3])
-    file = File("Invoice.pdf", 12, 5)
+    file = File(f"{inv_num}.pdf", 12, 5)
     print("""
           ---Customer Type---
           1. Private
@@ -131,8 +130,9 @@ def set_invoice_data_private(itm, amount, gross):
     Returns:
         var: invoice data as a namedtuple
     """
-    gr_tot = float(gross)*float(amount)
-    nt_per_one = str(round(float(gross * 0.75), 2))
+    gr_tot = gross
+    gr_per_one = float(gr_tot) / float(amount)
+    nt_per_one = str(round(float(gr_per_one * 0.75), 2))
     nt_tot = str(round(float(gr_tot * 0.75), 2))
     tx_tot = str(round(float(gr_tot * 0.25), 2))
     inv_data = InvData(amount, itm, gr_tot, nt_per_one, nt_tot, tx_tot)

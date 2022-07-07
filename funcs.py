@@ -3,6 +3,7 @@ from random import randint
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
+from exportpdf import sort_data
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -48,10 +49,11 @@ def choose_customer():
         else:
             customer = existing_customers[choise - 1]
             account_no = RECEIVABLES.worksheet(customer).acell('A1').value
-            #address_row = INDEX.worksheet('addresses').find(customer).row
-            #address = INDEX.worksheet('addresses').row_values(address_row)
+            address_row = INDEX.worksheet('addresses').find(customer).row
+            address = INDEX.worksheet('addresses').row_values(address_row)
+            print(address)
             print(f"{customer} chosen. Proceeding.")
-            return [customer, account_no]
+            return [account_no, address]
 
 def choose_supplier():
     """Show existing suppliers and add new if not in list
@@ -80,9 +82,10 @@ def choose_supplier():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
-            account_no = RECEIVABLES.worksheet(existing_suppliers[choise - 1]).acell('A1').value
-            print(f"{existing_suppliers[choise - 1]} chosen. Proceeding.")
-            return [existing_suppliers[choise - 1], account_no]
+            supplier = existing_suppliers[choise - 1]
+            account_no = RECEIVABLES.worksheet(supplier).acell('A1').value
+            print(f"{supplier} chosen. Proceeding.")
+            return [supplier, account_no]
 
 def new_worksheet(spreadsheet, title, code):
     """creates a new worksheet using a base template
@@ -221,6 +224,7 @@ def how_many_items():
         while int_choise > 0:
             items.append(product_menu())
             int_choise -= 1
+        print(items)
         return items
 
 
@@ -437,7 +441,43 @@ def is_item_in_list(lst, item):
             return False
     return True
 
-def write_cr_sale(details: list, date: str, customer: list):
+def sort_cr_sale_data(details: list, date: str, customer: list):
+    """passes transaction data to append_data
+
+    Args:
+        details (list): [[product name, amount]]
+        date (str): transaction date
+        customer (list): [account number, [name, address, city, postcode, country]]
+    """
+    print('Writing transaction data...')
+    grosses = []
+    stock_itms = []
+    order = []
+    for prod in details:
+        product = prod[0]
+        amount = prod[1]
+        gross = float(get_gross_total(product, amount))
+        grosses.append(gross)
+        stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
+        order.append([product, amount, gross])
+    gross_total = float(sum(grosses))
+    print(f"Gross total: {gross_total}")
+    print(gross_total)
+    name = customer[1][0]
+    account_no = customer[0]
+    address = customer[1][1:5]
+    trans_id = get_trans_id('SC')
+    inv_no = f"INV{str(gen_rand_list(2))}"
+    print(f"Transaction ID: {trans_id}")
+    print(f"Invoice number: {inv_no}")
+    data = [name, account_no, gross_total, trans_id, inv_no, date]
+    #for itm in stock_itms:
+        #data_ls.append(itm)
+    write_cr_sale(data, stock_itms)
+    print(order)
+    sort_data(order, date, inv_no, trans_id, name, address)
+    #return [inv_no, trans_id]
+def write_cr_sale(data, stock_list):
     """passes transaction data to append_data
 
     Args:
@@ -446,34 +486,21 @@ def write_cr_sale(details: list, date: str, customer: list):
         customer (list): [customer name, account number]
     """
     print('Writing transaction data...')
-    product = details[0]
-    amount = details[1]
-    gross_total = get_gross_total(product, amount)
-    #stock_itms = []
-    #for prod in details:
-        #product = prod[0]
-        #amount = prod[1]
-        #gross = get_gross_total(product, amount)
-        #grosses.append(gross)
-        #stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
-    #gross_total = sum(grosses)
-    print(gross_total)
-    account_no = customer[1]
-    trans_id = get_trans_id('SC')
-    inv_no = f"INV{str(gen_rand_list(2))}"
-    print(inv_no)
+    name = data[0]
+    account_no = data[1]
+    gross_total = data[2]
+    trans_id = data[3]
+    inv_no = data[4]
+    date = data[5]
     data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total]],
     [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', trans_id, gross_total]],
     [RECEIVABLES, name, ['Invoice', gross_total, inv_no]],
-    [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total]],
-    [STOCK, product, [date, '', amount, gross_total, gross_total/amount]]
+    [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total]]
     ]
-    #for itm in stock_itms:
-        #data_ls.append(itm)
+    for itm in stock_list:
+        data_ls.append(itm)
     append_data(data_ls)
-    #return [inv_no, trans_id]
-
 
 def write_dr_sale(details: list, date: str):
     """passes transaction data to append_data

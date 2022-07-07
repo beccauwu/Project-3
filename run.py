@@ -1,6 +1,4 @@
 from funcs import *
-from exportpdf import sort_data
-
 def start():
     """
     Start menu where the user can choose between 4 different tasks.
@@ -42,12 +40,12 @@ def sale():
     """
     Menu for accounting sales
     """
-    details = product_menu()
+    details = how_many_items()
     date = get_date()
     trans_type = cash_or_credit('Sale')
     if trans_type == 1:
         customer = choose_customer()
-        write_cr_sale(details, date, customer)
+        sort_cr_sale_data(details, date, customer)
         #sort_data(details, date, nums[0], nums[1], customer[0], customer[2][1:5])
 
     elif trans_type == 2:
