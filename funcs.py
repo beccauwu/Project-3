@@ -467,7 +467,7 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     account_no = customer[0]
     address = customer[1][1:5]
     trans_id = get_trans_id('SC')
-    inv_no = f"INV{str(gen_rand_list(2))}"
+    inv_no = f"INV{str(gen_rand_list(3))}"
     print(f"Transaction ID: {trans_id}")
     print(f"Invoice number: {inv_no}")
     data = [name, account_no, gross_total, trans_id, inv_no, date]
