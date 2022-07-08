@@ -5,6 +5,8 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import ParagraphStyle
+from gdriveupload import upload_to_folder
+
 
 Creator = namedtuple("Creator", ["name", "email", "phone_num", "account", "vat_reg_no"])
 Customer = namedtuple("Customer", ["name", "address", "city", "postcode", "country"])
@@ -93,6 +95,7 @@ def generate_pdf(invoice_num, filename, vat_no, tbl_one, tbl_two, summary, sammo
     SimpleDocTemplate(filename, pagesize=A4,
                         rightMargin=12, leftMargin=12,
                         topMargin=12, bottomMargin=6).build(pdf_content)
+    upload_to_folder(filename)
 
 def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     """
@@ -103,7 +106,7 @@ def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     creator = Creator('Test User', 'test@gmail.com', '098912312','DE1921 3210 9381 8211', 'SE00000000001')
     customer = Customer(name, address[0], address[1], address[2], address[3])
     print(f"customer: {customer}")
-    file = File("Invoice.pdf", 12, 5)
+    file = File(f"{inv_num}.pdf", 12, 5)
     print("""
           ---Customer Type---
           1. Private
