@@ -5,10 +5,10 @@ def start():
     """
     print("""
                 --------MENU--------
-                1. Account for sale\n\
-                2. Account for purchase\n\
-                3. Reconcile\n\
-                4. Create financial statements\n\
+                1. Account for sales\n\
+                2. Account for purchases\n\
+                3. Account for sales receipts\n\
+                4. Account for purchase payments\n\
                     """)
     while True:
         choise = input("Choose an option: \n")
@@ -23,7 +23,7 @@ def start():
             print("\033c")
             break
         if choise == '3':
-            print("Taking you account reconciliation...\n")
+            print("Taking you sales receipte...\n")
             reconciliation()
             print("\033c")
             break
@@ -57,6 +57,7 @@ def purchase():
     Menu for accounting purchases
     """
     details = purchases_menu()
+    products = details[0]
     date = get_date()
     trans_type = cash_or_credit('Purchase')
     net_price = input('Enter the net price of purchase:')
@@ -64,7 +65,7 @@ def purchase():
     if trans_type == 1:
         supplier = choose_supplier()
         invoice_num = input('Enter the invoice number:')
-        sort_cr_purchase_data([date, supplier[0], supplier[1], net_price, gross_price, invoice_num], details)
+        write_cr_purchase(products, [date, supplier[0], supplier[1], net_price, gross_price, invoice_num], details[1])
     elif trans_type == 2:
         write_dr_purchase(details, date)
 

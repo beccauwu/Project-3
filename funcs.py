@@ -20,158 +20,8 @@ GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
 INDEX = GSPREAD_CLIENT.open('index')
 STOCK = GSPREAD_CLIENT.open('stock')
 
-def choose_customer():
-    """Show existing customers and add new if not in list
 
-    Returns:
-        list: [Customer name, account no]
-    """
-    existing_customers = get_worksheet_titles(RECEIVABLES)
-    last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
-    num = 1
-    for customer in existing_customers:
-        print(num, '', customer)
-        num += 1
-    while True:
-        choise = int(input("Choose a customer: \n"))
-        print("If adding a new customer, press 'n'\n")
-        if choise == 'n':
-            name = input('Customer name:')
-            new = new_account_number(last_account_no)
-            new_worksheet(RECEIVABLES, name, new)
-            return [name, new]
-        try:
-            int(choise) < len(existing_customers)
-        except TypeError as type_error:
-            print(f"Invalid character: {type_error}, try again")
-        except ValueError as value_error:
-            print(f"Chosen value {value_error} is not valid, please try again")
-        else:
-            customer = existing_customers[choise - 1]
-            account_no = RECEIVABLES.worksheet(customer).acell('A1').value
-            address_row = INDEX.worksheet('addresses').find(customer).row
-            address = INDEX.worksheet('addresses').row_values(address_row)
-            print(address)
-            print(f"{customer} chosen. Proceeding.")
-            return [account_no, address]
 
-def choose_supplier():
-    """Show existing suppliers and add new if not in list
-
-    Returns:
-        list: [Supplier name, account no]
-    """
-    existing_suppliers = get_worksheet_titles(PAYABLES)
-    last_account_no = PAYABLES.worksheet(existing_suppliers[- 1]).acell('A1').value
-    num = 1
-    for supplier in existing_suppliers:
-        print(num, '', supplier)
-        num += 1
-    while True:
-        choise = int(input("Choose a supplier: \n"))
-        print("If adding a new supplier, press 'n'\n")
-        if choise == 'n':
-            name = input('Supplier name:')
-            new = new_account_number(last_account_no)
-            new_worksheet(PAYABLES, name, new)
-            return [name, new]
-        try:
-            int(choise) < len(existing_suppliers)
-        except TypeError as type_error:
-            print(f"Invalid character: {type_error}, try again")
-        except ValueError as value_error:
-            print(f"Chosen value {value_error} is not valid, please try again")
-        else:
-            supplier = existing_suppliers[choise - 1]
-            account_no = RECEIVABLES.worksheet(supplier).acell('A1').value
-            print(f"{supplier} chosen. Proceeding.")
-            return [supplier, account_no]
-
-def new_worksheet(spreadsheet, title, code):
-    """creates a new worksheet using a base template
-
-    Args:
-        spreadheet (const): spreadsheet to add to
-        title (str): new worksheet title
-        code (str): value of A1
-    """
-    new_sheet = spreadsheet.duplicate_sheet('Base')
-    new_sheet.update_title(title)
-    new_sheet.update('A1', code)
-
-def new_account_number(last):
-    """Gets a new account number for new worksheets
-
-    Args:
-        ssh (var): spreadsheet to index
-
-    Returns:
-        int: new number
-    """
-    code = last[0:2]
-    num = int(''.join(c for c in last if c.isdigit()))
-    num += 10
-    print(f"New account number is: RL{num}")
-    return f"{code}{num}"
-
-def get_cell_val(ssh, wsh, cell):
-    """Gets cell value from worksheet
-
-    Args:
-        ssh (const): spreadsheet to access
-        wsh (str): worksheet in spreadsheet
-        cell (str): cell to read value from
-
-    Returns:
-        str: cell calue
-    """
-    cv = ssh.worksheet(wsh).acell(cell).value
-    return cv
-
-def get_worksheet_titles(spreadsheet):
-    """
-    Show existing worksheet titles
-
-    Args:
-        spreadsheet (var): spreadsheet to index
-    """
-    print('Getting list of worksheets...')
-    worksheet_list = []
-    for worksheet in spreadsheet.worksheets():
-        worksheet_list.append(worksheet.title)
-    return worksheet_list
-
-def append_data(data_list):
-    """Appends data to specified sheet
-
-    Args:
-        data (list): list of data
-        [spreadsheet, worksheet, data]
-    """
-    print('Reading data...')
-    with ChargingBar('Writing data|', max=len(data_list)) as progress_bar:
-        for data in data_list:
-            spreadsheet = data[0]
-            worksheet = data[1]
-            data_to_write = data[2]
-            sheet = spreadsheet.worksheet(worksheet)
-            sheet.append_row(data_to_write)
-            progress_bar.next()
-    print('Operation Successful.')
-
-def gen_rand_list(num):
-    """generates a list with random digits
-
-    Args:
-        num (int): length of list
-
-    Returns:
-        str: string with random digits
-    """
-    rand_str = ""
-    while len(rand_str) <= num:
-        rand_str += str(randint(0, 9))
-    return rand_str
 
 def product_menu():
     """
@@ -210,6 +60,120 @@ def product_menu():
             return ['NaOH', products]
         print("Not a valid input please enter a number 1-4")
 
+
+def purchases_menu():
+    """creates list of items purchased
+    Returns:
+        list: list with items
+        [[product, price]]
+    """
+    print(
+        """
+        ---Type of product(s)---
+        1. Current asset
+        (replenishing stock)
+        2. Non-current asset
+        (equipment, other materials that will last for over a year)
+        """
+        )
+    while True:
+        choise = input("Choose an option: \n")
+        if choise == '1':
+            return how_many_items(), 'Current Assets'
+        if choise == '2':
+            return no_of_products(), 'Non-Current Assets'
+        print('Entered value is not valid.')
+        print('Please try again.')
+
+
+
+
+def choose_customer():
+    """Show existing customers and add new if not in list
+
+    Returns:
+        list: [Customer name, account no]
+    """
+    existing_customers = get_worksheet_titles(RECEIVABLES)
+    last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
+    num = 1
+    for customer in existing_customers:
+        print(num, '', customer)
+        num += 1
+    while True:
+        choise = int(input("Choose a customer: \n"))
+        print("If adding a new customer, press 'n'\n")
+        if choise == 'n':
+            name = input('Customer name:')
+            new = new_account_number(last_account_no)
+            new_worksheet(RECEIVABLES, name, new)
+            return [name, new]
+        try:
+            int(choise) < len(existing_customers)
+        except TypeError as type_error:
+            print(f"Invalid character: {type_error}, try again")
+        except ValueError as value_error:
+            print(f"Chosen value {value_error} is not valid, please try again")
+        else:
+            customer = existing_customers[choise - 1]
+            account_no = RECEIVABLES.worksheet(customer).acell('A1').value
+            address_row = INDEX.worksheet('addresses').find(customer).row
+            address = INDEX.worksheet('addresses').row_values(address_row)
+            print(address)
+            print(f"{customer} chosen. Proceeding.")
+            return [account_no, address]
+
+
+
+def choose_supplier():
+    """Show existing suppliers and add new if not in list
+
+    Returns:
+        list: [Supplier name, account no]
+    """
+    existing_suppliers = get_worksheet_titles(PAYABLES)
+    last_account_no = PAYABLES.worksheet(existing_suppliers[- 1]).acell('A1').value
+    num = 1
+    for supplier in existing_suppliers:
+        print(num, '', supplier)
+        num += 1
+    while True:
+        choise = int(input("Choose a supplier: \n"))
+        print("If adding a new supplier, press 'n'\n")
+        if choise == 'n':
+            name = input('Supplier name:')
+            new = new_account_number(last_account_no)
+            new_worksheet(PAYABLES, name, new)
+            return [name, new]
+        try:
+            int(choise) < len(existing_suppliers)
+        except TypeError as type_error:
+            print(f"Invalid character: {type_error}, try again")
+        except ValueError as value_error:
+            print(f"Chosen value {value_error} is not valid, please try again")
+        else:
+            supplier = existing_suppliers[choise - 1]
+            account_no = PAYABLES.worksheet(supplier).acell('A1').value
+            print(f"{supplier} chosen. Proceeding.")
+            return [supplier, account_no]
+
+
+
+
+def gen_rand_list(num):
+    """generates a list with random digits
+
+    Args:
+        num (int): length of list
+
+    Returns:
+        str: string with random digits
+    """
+    rand_str = ""
+    while len(rand_str) <= num:
+        rand_str += str(randint(0, 9))
+    return rand_str
+
 def how_many_items():
     """checks how many different items were ordered
 
@@ -228,58 +192,43 @@ def how_many_items():
         return items
 
 
-def purchases_menu():
-    """
-    prints products and based on choise calls a parent
-    """
-    print(
-        """
-        ---Type of product(s)---
-        1. Current asset
-        (replenishing stock, every day business expenses,
-        new items for sale)
-        2. Non-current asset
-        (equipment, other materials that will last for over a year)
-        """
-        )
-    while True:
-        choise = input("Choose an option: \n")
-        if choise == '1':
-            products = no_of_products(1)
-            return products
-        if choise == '2':
-            products = no_of_products(2)
-            return products
-        print("Not a valid input please enter a number 1-2")
 
-def no_of_products(num):
+
+def no_of_products():
+    """user enters no of products purchased,
+    generates list with products
+
+    Args:
+        num (int): type of asset bought
+    Returns:
+        list: [[product, price]]
+    """
     items = []
     print('Did you buy several products?')
-    if num == 1:
-        while True:
-            choise = input('Type the amount of different products you bought:')
-            if not int(choise):
-                raise TypeError(f'Value entered ({choise}) is not valid.')
-            else:
-                int_choise_static = int(choise)
-                order = 1
-                int_choise = int(choise)
-                while int_choise > 0:
-                    if num == 1:
-                        items.append(product_menu())
-                        int_choise -= 1
-                        order +=1
-                        return items
-                    items.append(enter_products(order, int_choise_static))
-                    int_choise -= 1
-                    order +=1
-                    return items
+    while True:
+        choise = how_many(input('Type the amount of different products you bought:'))
+        int_choise = int(choise)
+        while int_choise > 0:
+            items.append(enter_products())
+            int_choise -= 1
+        print(items)
+        return items
 
-def enter_products(num1, num2):
-    print(f'What product did you buy ({num1}/{num2})')
-    product = input('Enter product description:')
-    price = input('Enter the net value of the product:')
-    return [product, price]
+def enter_products():
+    """gets product info for non-current asset purchases
+
+    Args:
+        num1 (int): the position of product
+        num2 (int): number of products to enter in total
+
+    Returns:
+        _type_: _description_
+    """
+    print('What product did you buy?')
+    while True:
+        product = input('Enter product description:')
+        price = input('Enter the net value of the product:')
+        return [product, float(price)]
 
 def how_many(var):
     """prompts for an amount of something
@@ -291,14 +240,13 @@ def how_many(var):
         str: 'chosen amount'
     """
     while True:
-        products = var
         try:
-            int(products)
+            int(var)
         except TypeError as typ_err:
             print(f"Chosen value {typ_err} is not an integer.")
             print('Please try again.')
         else:
-            return int(products)
+            return int(var)
 
 def cash_or_credit(trans_type: str):
     """
@@ -460,7 +408,7 @@ def is_item_in_list(lst, item):
             return False
     return True
 
-def make_item_list(date: str, items: list, ttype: int, inv_no= None):
+def make_item_list(date: str, items: list, ttype: int, extratype:int= None):
     """generates a list of products to add to list which is appended to spreadsheets
 
     Args:
@@ -472,9 +420,7 @@ def make_item_list(date: str, items: list, ttype: int, inv_no= None):
        list: list with complete data
     """
     stock_itms = []
-    ca_itms = []
     grosses = []
-    ca_status = False
     for itm in items:
         product = itm[0]
         amount = itm[1]
@@ -483,14 +429,19 @@ def make_item_list(date: str, items: list, ttype: int, inv_no= None):
         if ttype == 1:
             stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
         if ttype == 2:
-            ca_status = True
-            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount]])
-            ca_itms.append([GENERAL_LEDGER, 'Current Assets', [itm[0], inv_no, float(itm[1])]])    
+            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount]]) 
+        if extratype == 1:
+            stock_itms.append([GENERAL_LEDGER, 'Non-Current Assets',
+                           ['', '', '', 'GL400', product, gross]])
+    if extratype == 2:
+        stock_itms.append([GENERAL_LEDGER, 'Current Assets',
+                      ['', '', '', 'GL400', 'Stock refill', gross]])
     gross_total = float(sum(grosses))
     print(f"Gross total: {gross_total}")
-    if ca_status:
-        return [stock_itms, ca_itms, gross_total]
     return [stock_itms, gross_total]
+
+
+
 
 def sort_cr_sale_data(details: list, date: str, customer: list):
     """passes transaction data to append_data
@@ -505,7 +456,7 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     account_no = customer[0]
     address = customer[1][1:5]
     trans_id = get_trans_id('SC')
-    inv_no = f"INV{str(gen_rand_list(3))}"
+    inv_no = get_inv_id()
     print(f"Transaction ID: {trans_id}")
     print(f"Invoice number: {inv_no}")
     get_data = make_item_list(date, details, 1)
@@ -513,11 +464,14 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     data = [name, account_no, get_data[1], trans_id, inv_no, date]
     order = []
     for itm in get_data[0]:
-        order.append(itm[1])
-        order.append(itm[2][2])
-        order.append(itm[2][3])
-    write_cr_sale(data, get_data[0])
+        order.append([itm[1], itm[2][2], itm[2][3]])
+    print(order)
+    #write_cr_sale(data, get_data[0])
     sort_data(order, date, inv_no, trans_id, name, address)
+
+
+#write data
+
 
 def write_cr_sale(data, stock_list):
     """passes transaction data to append_data
@@ -551,11 +505,9 @@ def write_dr_sale(details: list, date: str):
         date (str): transaction date
     """
     print('Writing transaction data...')
-    product = details[0]
-    amount = details[1]
-    gross = get_gross_total(product, amount)
     trans_id = get_trans_id('SD')
-    get_data = make_item_list(date, data[0], 1)
+    get_data = make_item_list(date, details, 1)
+    gross = get_data[1]
     data_ls = [
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
@@ -566,32 +518,35 @@ def write_dr_sale(details: list, date: str):
         data_ls.append(itm)
     append_data(data_ls)
 
-def write_cr_purchase(itms, data):
+def write_cr_purchase(itms, data, acct):
     """passes transaction data to append_data
 
     Args:
         details (list): [product name, amount]
         date (str): transaction date
-        customer (list): [customer name, account number]
+        supplier (list): [supplier name, account number]
     """
     print('Writing transaction data...')
-    gross = price[1]
-    account_no = supplier[1]
-    name = supplier[0]
-    get_data = make_item_list(date, itms, 2, inv_no)
+    account_no = data[2]
+    name = data[1]
+    price = data[3:5]
+    inv_no = data[5]
+    date = data[0]
+    if acct == 'Non-Current Assets':
+        get_data = make_item_list(date, itms, 2, 1)
+    else:
+        get_data = make_item_list(date, itms, 2, 2)
+    gross = float(get_data[1])
     data_ls = [
     [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross]],
-    [GENERAL_LEDGER, 'Current Assets', ['', '', '', 'GL300', account_no, gross]],
-    [RECEIVABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'sdb', [date, account_no, price[0], float(price[1])-float(price[0]), gross]]
+    [PAYABLES, name, ['Invoice', gross, inv_no]],
+    [ACCOUNTS, 'pdb', [date, account_no, price[0]]]
     ]
-    for itm in itms:
-        data_ls.append()
-    for item in get_data[0]:
-        data_ls.append(item)
+    for itm in get_data[0]:
+        data_ls.append(itm)
     append_data(data_ls)
 
-def write_dr_purchase(details: list, date: str):
+def write_dr_purchase(itm, data,):
     """passes transaction data to append_data
 
     Args:
@@ -604,10 +559,90 @@ def write_dr_purchase(details: list, date: str):
     gross = get_gross_total(product, amount)
     trans_id = f"SD{gen_rand_list(3)}"
     data_ls = [
-        [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
-        [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
-        [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
+        [GENERAL_LEDGER, 'Cash', ['','','', itm, trans_id, gross * 0.75]],
+        [GENERAL_LEDGER, 'Sales Tax', ['', '', '', 'cash purchase', trans_id, gross * 0.25]],
+        [GENERAL_LEDGER, 'Non-Current Assets', ['', '', '', ['sales', trans_id, gross]]],
         [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]],
         [STOCK, product, [date, '', amount, gross, gross/amount]]
     ]
     append_data(data_ls)
+
+
+
+
+#gspread stuff
+
+def new_worksheet(spreadsheet, title, code):
+    """creates a new worksheet using a base template
+
+    Args:
+        spreadheet (const): spreadsheet to add to
+        title (str): new worksheet title
+        code (str): value of A1
+    """
+    new_sheet = spreadsheet.duplicate_sheet('Base')
+    new_sheet.update_title(title)
+    new_sheet.update('A1', code)
+
+def new_account_number(last):
+    """Gets a new account number for new worksheets
+
+    Args:
+        ssh (var): spreadsheet to index
+
+    Returns:
+        int: new number
+    """
+    code = last[0:2]
+    num = int(''.join(c for c in last if c.isdigit()))
+    num += 10
+    print(f"New account number is: RL{num}")
+    return f"{code}{num}"
+
+def get_cell_val(ssh, wsh, cell):
+    """Gets cell value from worksheet
+
+    Args:
+        ssh (const): spreadsheet to access
+        wsh (str): worksheet in spreadsheet
+        cell (str): cell to read value from
+
+    Returns:
+        str: cell calue
+    """
+    cv = ssh.worksheet(wsh).acell(cell).value
+    return cv
+
+def get_worksheet_titles(spreadsheet):
+    """
+    Show existing worksheet titles
+
+    Args:
+        spreadsheet (var): spreadsheet to index
+    """
+    print('Getting list of worksheets...')
+    worksheet_list = []
+    for worksheet in spreadsheet.worksheets():
+        worksheet_list.append(worksheet.title)
+    return worksheet_list
+
+
+
+
+def append_data(data_list):
+    """Appends data to specified sheet
+
+    Args:
+        data (list): list of data
+        [spreadsheet, worksheet, data]
+    """
+    print('Reading data...')
+    with ChargingBar('Writing data|', max=len(data_list)) as progress_bar:
+        for data in data_list:
+            spreadsheet = data[0]
+            worksheet = data[1]
+            data_to_write = data[2]
+            sheet = spreadsheet.worksheet(worksheet)
+            sheet.append_row(data_to_write)
+            progress_bar.next()
+    print('Operation Successful.')
