@@ -35,6 +35,8 @@ def upload_to_folder(filename):
                                       fields='id').execute()
         print(F'File with ID: "{file.get("id")}" has been added to the folder with '
               F'ID "{folder_id}".')
+        print("Open created invoice:")
+        print(f"https://drive.google.com/file/d/{file.get('id')}/view?usp=sharing")
 
     except HttpError as error:
         print(F'An error occurred: {error}')
