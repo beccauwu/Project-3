@@ -33,7 +33,7 @@ def upload_to_folder(filename):
         # pylint: disable=maybe-no-member
         file = service.files().create(body=file_metadata, media_body=media,
                                       fields='id').execute()
-        print(F'File with ID: "{file.get("id")}" has added to the folder with '
+        print(F'File with ID: "{file.get("id")}" has been added to the folder with '
               F'ID "{folder_id}".')
 
     except HttpError as error:
