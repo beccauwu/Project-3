@@ -4,6 +4,8 @@ from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
 from exportpdf import sort_data
+from gdriveupload import end
+
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -466,7 +468,7 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     for itm in get_data[0]:
         order.append([itm[1], itm[2][2], itm[2][3]])
     print(order)
-    #write_cr_sale(data, get_data[0])
+    write_cr_sale(data, get_data[0])
     sort_data(order, date, inv_no, trans_id, name, address)
 
 
@@ -496,6 +498,7 @@ def write_cr_sale(data, stock_list):
     for itm in stock_list:
         data_ls.append(itm)
     append_data(data_ls)
+    end()
 
 def write_dr_sale(details: list, date: str):
     """passes transaction data to append_data
@@ -517,6 +520,7 @@ def write_dr_sale(details: list, date: str):
     for itm in get_data[0]:
         data_ls.append(itm)
     append_data(data_ls)
+    end()
 
 def write_cr_purchase(itms, data, acct):
     """passes transaction data to append_data
@@ -545,6 +549,7 @@ def write_cr_purchase(itms, data, acct):
     for itm in get_data[0]:
         data_ls.append(itm)
     append_data(data_ls)
+    end()
 
 def write_dr_purchase(itm, data,):
     """passes transaction data to append_data
@@ -566,6 +571,7 @@ def write_dr_purchase(itm, data,):
         [STOCK, product, [date, '', amount, gross, gross/amount]]
     ]
     append_data(data_ls)
+    end()
 
 
 
@@ -646,3 +652,7 @@ def append_data(data_list):
             sheet.append_row(data_to_write)
             progress_bar.next()
     print('Operation Successful.')
+
+
+
+
