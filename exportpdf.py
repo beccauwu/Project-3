@@ -262,7 +262,7 @@ def create_content(pdf_invoice_obj, itms:list):
     )
     summary = [
         [Paragraph(f"Total due by {pdf_invoice_obj.due}:", price_bold),
-        Paragraph(f"{sum(grosses)}", price_normal)],
+        Paragraph(f"€{sum(grosses)}", price_normal)],
         [Paragraph("To account:", price_bold),
         Paragraph(f"{pdf_invoice_obj.creator.account}", price_normal)],
         [Paragraph("Use reference:", price_bold),
