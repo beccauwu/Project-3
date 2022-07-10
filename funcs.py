@@ -731,9 +731,12 @@ def append_data(data_list):
 
     Args:
         data (list): list of data
-        [spreadsheet, worksheet, data, left?]
-            left: true if data is added to left side in accounts (Dr)
-                    false if added to right (Cr)
+        [[spreadsheet, worksheet, data, left?]]
+            spreadsheet (var): spreadsheet where worksheet is
+            worksheet (str): worksheet data is added to
+            data (list): list of data to write to worksheet
+            left? (bool): True if data is added to left side in accounts (Dr)
+                          False if added to right (Cr)
     """
     print('Reading data...')
     with ChargingBar('Writing data|', max=len(data_list)) as progress_bar:
@@ -757,30 +760,3 @@ def append_data(data_list):
             sheet.update('A4:F', vals)
             progress_bar.next()
     print('Operation Successful.')
-
-def get_vals():
-    wsh = GENERAL_LEDGER.worksheet('Trade Payables')
-    vals = wsh.get_all_values()[3:]
-    new_vals = ['PL300', 'TEST3333', 14]
-    new_vals2 = ['PL400', 'TEST3433', 44]
-    continue_loop = True
-    print(vals)
-    for val in vals:
-        while True:
-            if not val[3] and continue_loop:
-                del val[3:]
-                val.extend(new_vals)
-                continue_loop = False
-            break
-    wsh.update('A4:F', vals)
-    continue_loop = True
-    print(vals)
-    for val in vals:
-        while True:
-            if not val[3] and continue_loop:
-                del val[3:]
-                val.extend(new_vals2)
-                continue_loop = False
-            break
-    wsh.update('A4:F', vals)
-    print(vals)
