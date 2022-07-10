@@ -1,4 +1,5 @@
 from funcs import *
+
 def start():
     """
     Start menu where the user can choose between 4 different tasks.
@@ -23,13 +24,13 @@ def start():
             print("\033c")
             break
         if choise == '3':
-            print("Taking you sales receipte...\n")
-            reconciliation()
+            print("Taking you sales receipts...\n")
+            sales_receipt()
             print("\033c")
             break
         if choise == '4':
-            print("Taking you to financial statements...\n")
-            financial_statements()
+            print("Taking you to purchase payments...\n")
+            purchase_payments()
             print("\033c")
             break
         print("Not a valid input please enter a number 1-4")
@@ -69,28 +70,21 @@ def purchase():
     elif trans_type == 2:
         write_dr_purchase(details, date)
 
-def reconciliation():
+def sales_receipt():
     """
-    Menu for reconciling accounts
+    registers sales receipts
     """
-    print("""
-                --------Reconciliations--------
-                    """)
-    while True:
-        choise = input("Start reconciliation?")
-        if yes_or_no(choise):
-            reconcile_accounts()
-        if choise == 'y':
-            credit_sale()
-            print("\033c")
-            break
-        elif choise == 'n':
-            print("Going back to menu...\n")
-            start()
-            print("\033c")
-            break
-        else:
-            print("Not a valid input please enter a number 1-3")
+    customer = choose_customer()
+    data = sales_receipts_menu(customer[1][0], customer[0])
+    register_sales_receipt(data)
+
+def purchase_payments():
+    """
+    registers purchase payments
+    """
+    supplier = choose_supplier()
+    data = sales_receipts_menu(supplier[0], supplier[1])
+    register_sales_receipt(data)
 def yes_or_no(question):
     """
     Function to check yes/no questions

@@ -5,7 +5,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
-from run import start
 
 
 def upload_to_folder(filename):
@@ -38,7 +37,7 @@ def upload_to_folder(filename):
         fileid = file.get('id')
         print(F'File with ID: "{fileid}" has been added to the folder with '
               F'ID "{folder_id}".')
-        end(fileid)
+        end()
 
     except HttpError as error:
         print(F'An error occurred: {error}')
@@ -62,18 +61,14 @@ def end(fileid= None):
     print('https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing')
     print('Open spreadsheets folder:')
     print('https://drive.google.com/drive/folders/1pOgtupYWIjwE0W5tDjbob2cMwOyht9K6?usp=sharing\n')
-    print("""
-          ---What would you like to do?---
-          1. Go to start menu
-          2. End
-          """)
+    print('Would you like to go back to start menu? (y/n)')
     while True:
-        choise = input('Choose an option:')
-        if choise == '1':
+        choise = input('Select an option:')
+        if choise in ('y', 'Y'):
             start()
             break
-        if choise == '2':
+        if choise in ('n', 'N'):
             print('Thank you for trying the app :)')
-            quit()
+            break
         print('Value entered is not valid.')
         print('Please try again.')

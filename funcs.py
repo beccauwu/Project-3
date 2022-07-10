@@ -1,10 +1,8 @@
-from pprint import pprint
 from random import randint
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
 from exportpdf import sort_data
-from gdriveupload import end
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -19,7 +17,7 @@ ACCOUNTS = GSPREAD_CLIENT.open('accounts')
 PAYABLES = GSPREAD_CLIENT.open('payables')
 RECEIVABLES = GSPREAD_CLIENT.open('receivables')
 GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
-INDEX = GSPREAD_CLIENT.open('index')
+DATABASE = GSPREAD_CLIENT.open('database')
 STOCK = GSPREAD_CLIENT.open('stock')
 
 
@@ -62,6 +60,48 @@ def product_menu():
             return ['NaOH', products]
         print("Not a valid input please enter a number 1-4")
 
+def sales_receipts_menu(customer, account):
+    """
+    Enters records of sales receipts into relevant accounts
+    """
+    print('First choose customer who made the payment\n')
+    inv_nos = RECEIVABLES.worksheet(customer).col_values(3)[1:]
+    print(inv_nos)
+    trans_id = get_trans_id('SR')
+    print(trans_id)
+    invoice = None
+    while True:
+        invoice = input('Enter invoice number for payment:')
+        try:
+            amount = -abs(float(input('Enter amount received:')))
+        except TypeError as typ_err:
+            print(f'Value entered {typ_err} is not valid.')
+            print('Please try again.')
+        else:
+            data = [customer, account, trans_id, amount, invoice]
+            print(data)
+            return data
+
+def register_sales_receipt(data):
+    """passes sales receipt data to append_data
+
+    Args:
+        data (list): list with data
+    """
+    customer = data[0]
+    account_no = data[1]
+    trans_id = data[2]
+    amount = data[3]
+    inv_no = data[4]
+    data_ls = [
+        [GENERAL_LEDGER, 'Trade Receivables', ['', '', '', account_no, trans_id, amount]],
+        [GENERAL_LEDGER, 'Cash', ['GL300', trans_id, amount * 0.75]],
+        [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25]],
+        [RECEIVABLES, customer, ['Payment', amount, inv_no]]
+    ]
+    append_data(data_ls)
+    print(f"Outstanding balance on {customer}'s account:")
+    print(RECEIVABLES.worksheet(customer).acell('E2').value())
 
 def purchases_menu():
     """creates list of items purchased
@@ -94,14 +134,15 @@ def choose_customer():
     """Show existing customers and add new if not in list
 
     Returns:
-        list: [Customer name, account no]
+        list: [account number, [address]]
     """
     existing_customers = get_worksheet_titles(RECEIVABLES)
     last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
     num = 1
     for customer in existing_customers:
-        print(num, '', customer)
-        num += 1
+        if customer != 'Base':
+            print(num, '', customer)
+            num += 1
     while True:
         choise = int(input("Choose a customer: \n"))
         print("If adding a new customer, press 'n'\n")
@@ -117,10 +158,10 @@ def choose_customer():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
-            customer = existing_customers[choise - 1]
+            customer = existing_customers[choise]
             account_no = RECEIVABLES.worksheet(customer).acell('A1').value
-            address_row = INDEX.worksheet('addresses').find(customer).row
-            address = INDEX.worksheet('addresses').row_values(address_row)
+            address_row = DATABASE.worksheet('addresses').find(customer).row
+            address = DATABASE.worksheet('addresses').row_values(address_row)
             print(address)
             print(f"{customer} chosen. Proceeding.")
             return [account_no, address]
@@ -367,17 +408,19 @@ def get_trans_id(ttype: str):
     Returns:
         str: new transaction id
     """
-    index_of = INDEX.worksheet('transactions')
+    index_of = DATABASE.worksheet('transactionids')
     old_trans_ids = index_of.col_values(1)
     while True:
         trans_id = f"{ttype}{str(gen_rand_list(7))}"
         if not is_item_in_list(old_trans_ids, trans_id):
             index_of.append_row([trans_id])
+        print(trans_id)
         return trans_id
 
 def get_inv_id():
-    """Generates a new invoice ID
-    and appends it to index of IDs
+    """
+    Generates a new invoice ID until the ID is unique (checks it against index of IDs)
+    Appends it to index of IDs
 
     Args:
         ttype (str): beginning of id
@@ -386,7 +429,7 @@ def get_inv_id():
     Returns:
         str: new transaction id
     """
-    index_of = INDEX.worksheet('invoices')
+    index_of = DATABASE.worksheet('invoiceids')
     old_inv_ids = index_of.col_values(1)
     while True:
         inv_id = f"INV{str(gen_rand_list(3))}"
@@ -551,7 +594,7 @@ def write_cr_purchase(itms, data, acct):
     append_data(data_ls)
     end()
 
-def write_dr_purchase(itm, data,):
+def write_dr_purchase(itms, data, acct):
     """passes transaction data to append_data
 
     Args:
@@ -559,17 +602,23 @@ def write_dr_purchase(itm, data,):
         date (str): transaction date
     """
     print('Writing transaction data...')
-    product = details[0]
-    amount = details[1]
-    gross = get_gross_total(product, amount)
-    trans_id = f"SD{gen_rand_list(3)}"
+    account_no = data[2]
+    name = data[1]
+    price = data[3:5]
+    inv_no = data[5]
+    date = data[0]
+    if acct == 'Non-Current Assets':
+        get_data = make_item_list(date, itms, 2, 1)
+    else:
+        get_data = make_item_list(date, itms, 2, 2)
+    gross = float(get_data[1])
     data_ls = [
-        [GENERAL_LEDGER, 'Cash', ['','','', itm, trans_id, gross * 0.75]],
-        [GENERAL_LEDGER, 'Sales Tax', ['', '', '', 'cash purchase', trans_id, gross * 0.25]],
-        [GENERAL_LEDGER, 'Non-Current Assets', ['', '', '', ['sales', trans_id, gross]]],
-        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]],
-        [STOCK, product, [date, '', amount, gross, gross/amount]]
+    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross]],
+    [PAYABLES, name, ['Invoice', gross, inv_no]],
+    [ACCOUNTS, 'pdb', [date, account_no, price[0]]]
     ]
+    for itm in get_data[0]:
+        data_ls.append(itm)
     append_data(data_ls)
     end()
 
@@ -652,7 +701,4 @@ def append_data(data_list):
             sheet.append_row(data_to_write)
             progress_bar.next()
     print('Operation Successful.')
-
-
-
 
