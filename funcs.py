@@ -65,20 +65,20 @@ def sales_receipts_menu(customer, account):
     Enters records of sales receipts into relevant accounts
     """
     print('First choose customer who made the payment\n')
-    # inv_nos = RECEIVABLES.worksheet(customer).col_values(3)[1:]
-    # print(inv_nos)
+    inv_nos = RECEIVABLES.worksheet(customer).col_values(3)[1:]
+    print(inv_nos)
     trans_id = get_trans_id('SR')
     print(trans_id)
-    # invoice = None
+    invoice = None
     while True:
-        # invoice = input('Enter invoice number for payment:')
+        invoice = input('Enter invoice number for payment:')
         try:
             amount = float(input('Enter amount received:'))
         except TypeError as typ_err:
             print(f'Value entered {typ_err} is not valid.')
             print('Please try again.')
         else:
-            data = [customer, account, trans_id, amount]
+            data = [customer, account, trans_id, amount, invoice]
             print(data)
             return data
 
@@ -86,20 +86,20 @@ def purchase_payments_menu(supplier, account):
     """
     Enters records of purchase payments into relevant accounts
     """
-    # inv_nos = PAYABLES.worksheet(supplier).col_values(3)[1:]
-    # print(inv_nos)
+    inv_nos = PAYABLES.worksheet(supplier).col_values(3)[1:]
+    print(inv_nos)
     trans_id = get_trans_id('PP')
     print(trans_id)
-    # invoice = None
+    invoice = None
     while True:
-        # invoice = input('Enter invoice number for payment:')
+        invoice = input('Enter invoice number for payment:')
         try:
             amount = float(input('Enter amount paid:'))
         except TypeError as typ_err:
             print(f'Value entered {typ_err} is not valid.')
             print('Please try again.')
         else:
-            data = [supplier, account, trans_id, amount]
+            data = [supplier, account, trans_id, amount, invoice]
             print(data)
             return data
 

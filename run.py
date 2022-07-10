@@ -76,14 +76,6 @@ def sales_receipt():
     """
     customer = choose_customer()
     data = sales_receipts_menu(customer[1][0], customer[0])
-    inv_nos = RECEIVABLES.worksheet(customer).col_values(3)[1:]
-    while True:
-        invoice = input('Enter invoice number for payment:')
-        if is_item_in_list(inv_nos, invoice):
-            data.append(invoice)
-            break
-        print('Invoice number is not valid.')
-        print('Please try again.')
     register_sales_receipt(data)
 
 def purchase_payments():
@@ -92,14 +84,6 @@ def purchase_payments():
     """
     supplier = choose_supplier()
     data = purchase_payments_menu(supplier[0], supplier[1])
-    inv_nos = PAYABLES.worksheet(supplier).col_values(3)[1:]
-    while True:
-        invoice = input('Enter invoice number for payment:')
-        if is_item_in_list(inv_nos, invoice):
-            data.append(invoice)
-            break
-        print('Invoice number is not valid.')
-        print('Please try again.')
     register_purchase_payment(data)
 
 def yes_or_no(question):
