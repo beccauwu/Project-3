@@ -65,20 +65,41 @@ def sales_receipts_menu(customer, account):
     Enters records of sales receipts into relevant accounts
     """
     print('First choose customer who made the payment\n')
-    inv_nos = RECEIVABLES.worksheet(customer).col_values(3)[1:]
-    print(inv_nos)
+    # inv_nos = RECEIVABLES.worksheet(customer).col_values(3)[1:]
+    # print(inv_nos)
     trans_id = get_trans_id('SR')
     print(trans_id)
-    invoice = None
+    # invoice = None
     while True:
-        invoice = input('Enter invoice number for payment:')
+        # invoice = input('Enter invoice number for payment:')
         try:
-            amount = -abs(float(input('Enter amount received:')))
+            amount = float(input('Enter amount received:'))
         except TypeError as typ_err:
             print(f'Value entered {typ_err} is not valid.')
             print('Please try again.')
         else:
-            data = [customer, account, trans_id, amount, invoice]
+            data = [customer, account, trans_id, amount]
+            print(data)
+            return data
+
+def purchase_payments_menu(supplier, account):
+    """
+    Enters records of purchase payments into relevant accounts
+    """
+    # inv_nos = PAYABLES.worksheet(supplier).col_values(3)[1:]
+    # print(inv_nos)
+    trans_id = get_trans_id('PP')
+    print(trans_id)
+    # invoice = None
+    while True:
+        # invoice = input('Enter invoice number for payment:')
+        try:
+            amount = float(input('Enter amount paid:'))
+        except TypeError as typ_err:
+            print(f'Value entered {typ_err} is not valid.')
+            print('Please try again.')
+        else:
+            data = [supplier, account, trans_id, amount]
             print(data)
             return data
 
@@ -87,6 +108,7 @@ def register_sales_receipt(data):
 
     Args:
         data (list): list with data
+        [customer, account number, transaction ID, amount, invoice number]
     """
     customer = data[0]
     account_no = data[1]
@@ -97,11 +119,33 @@ def register_sales_receipt(data):
         [GENERAL_LEDGER, 'Trade Receivables', ['', '', '', account_no, trans_id, amount]],
         [GENERAL_LEDGER, 'Cash', ['GL300', trans_id, amount * 0.75]],
         [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25]],
-        [RECEIVABLES, customer, ['Payment', amount, inv_no]]
+        [RECEIVABLES, customer, ['Payment', -abs(amount), inv_no]]
     ]
     append_data(data_ls)
     print(f"Outstanding balance on {customer}'s account:")
     print(RECEIVABLES.worksheet(customer).acell('E2').value())
+
+def register_purchase_payment(data):
+    """passes purchase payment data to append_data
+
+    Args:
+        data (list): list with data
+        [supplier, account number, transaction ID, amount, invoice number]
+    """
+    supplier = data[0]
+    account_no = data[1]
+    trans_id = data[2]
+    amount = data[3]
+    inv_no = data[4]
+    data_ls = [
+        [GENERAL_LEDGER, 'Trade Payables', ['', '', '', account_no, trans_id, amount]],
+        [GENERAL_LEDGER, 'Cash', ['GL400', trans_id, amount * 0.75]],
+        [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25]],
+        [PAYABLES, supplier, ['Payment', amount, inv_no]]
+    ]
+    append_data(data_ls)
+    print(f"Outstanding balance on {supplier}'s account:")
+    print(RECEIVABLES.worksheet(supplier).acell('E2').value())
 
 def purchases_menu():
     """creates list of items purchased
