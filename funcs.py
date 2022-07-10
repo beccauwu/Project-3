@@ -86,22 +86,23 @@ def purchase_payments_menu(supplier, account):
     """
     Enters records of purchase payments into relevant accounts
     """
-    inv_nos = PAYABLES.worksheet(supplier).col_values(3)[1:]
+    inv_nos = PAYABLES.worksheet(supplier).col_values(2)[3:]
     print(inv_nos)
     trans_id = get_trans_id('PP')
     print(trans_id)
     invoice = None
     while True:
         invoice = input('Enter invoice number for payment:')
-        try:
-            amount = float(input('Enter amount paid:'))
-        except TypeError as typ_err:
-            print(f'Value entered {typ_err} is not valid.')
-            print('Please try again.')
-        else:
+        if is_item_in_list(inv_nos, invoice):
+            try:
+                amount = float(input('Enter amount paid:'))
+            except TypeError as typ_err:
+                print(f'Value entered {typ_err} is not valid.')
+                print('Please try again.')
             data = [supplier, account, trans_id, amount, invoice]
             print(data)
             return data
+        raise ValueError(f'Invoice number {invoice} is not valid.')
 
 def register_sales_receipt(data):
     """passes sales receipt data to append_data
@@ -116,14 +117,14 @@ def register_sales_receipt(data):
     amount = data[3]
     inv_no = data[4]
     data_ls = [
-        [GENERAL_LEDGER, 'Trade Receivables', ['', '', '', account_no, trans_id, amount]],
-        [GENERAL_LEDGER, 'Cash', ['GL300', trans_id, amount * 0.75]],
-        [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25]],
-        [RECEIVABLES, customer, ['Payment', -abs(amount), inv_no]]
+        [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, amount]], False,
+        [GENERAL_LEDGER, 'Cash', ['GL300', trans_id, amount * 0.75], True],
+        [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25], True],
+        [RECEIVABLES, customer, ['Payment', -abs(amount), inv_no], False]
     ]
     append_data(data_ls)
     print(f"Outstanding balance on {customer}'s account:")
-    print(RECEIVABLES.worksheet(customer).acell('E2').value())
+    print(RECEIVABLES.worksheet(customer).acell('H4').value())
 
 def register_purchase_payment(data):
     """passes purchase payment data to append_data
@@ -138,14 +139,14 @@ def register_purchase_payment(data):
     amount = data[3]
     inv_no = data[4]
     data_ls = [
-        [GENERAL_LEDGER, 'Trade Payables', ['', '', '', account_no, trans_id, amount]],
-        [GENERAL_LEDGER, 'Cash', ['GL400', trans_id, amount * 0.75]],
-        [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25]],
-        [PAYABLES, supplier, ['Payment', amount, inv_no]]
+        [GENERAL_LEDGER, 'Trade Payables', [account_no, trans_id, amount], False],
+        [GENERAL_LEDGER, 'Cash', ['GL400', trans_id, amount * 0.75], True],
+        [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25], True],
+        [PAYABLES, supplier, ['Payment', amount, inv_no], False]
     ]
     append_data(data_ls)
     print(f"Outstanding balance on {supplier}'s account:")
-    print(RECEIVABLES.worksheet(supplier).acell('E2').value())
+    print(PAYABLES.worksheet(supplier).acell('H4').value())
 
 def purchases_menu():
     """creates list of items purchased
@@ -277,8 +278,6 @@ def how_many_items():
             int_choise -= 1
         print(items)
         return items
-
-
 
 
 def no_of_products():
@@ -493,9 +492,9 @@ def is_item_in_list(lst, item):
         False if not
     """
     for i in lst:
-        if str(item) != str(i):
-            return False
-    return True
+        if str(item) == str(i):
+            return True
+    return False
 
 def make_item_list(date: str, items: list, ttype: int, extratype:int= None):
     """generates a list of products to add to list which is appended to spreadsheets
@@ -516,15 +515,15 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None):
         gross = float(get_gross_total(product, amount))
         grosses.append(gross)
         if ttype == 1:
-            stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount]])
+            stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount], True])
         if ttype == 2:
-            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount]]) 
+            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount], True]) 
         if extratype == 1:
             stock_itms.append([GENERAL_LEDGER, 'Non-Current Assets',
-                           ['', '', '', 'GL400', product, gross]])
+                           ['GL400', product, gross], False])
     if extratype == 2:
         stock_itms.append([GENERAL_LEDGER, 'Current Assets',
-                      ['', '', '', 'GL400', 'Stock refill', gross]])
+                      ['GL400', 'Stock refill', gross], False])
     gross_total = float(sum(grosses))
     print(f"Gross total: {gross_total}")
     return [stock_itms, gross_total]
@@ -578,9 +577,9 @@ def write_cr_sale(data, stock_list):
     inv_no = data[4]
     date = data[5]
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total]],
-    [RECEIVABLES, name, ['Invoice', gross_total, inv_no]],
-    [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total]]
+    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total], True],
+    [RECEIVABLES, name, ['Invoice', gross_total, inv_no], True],
+    [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total], True]
     ]
     for itm in stock_list:
         data_ls.append(itm)
@@ -599,10 +598,10 @@ def write_dr_sale(details: list, date: str):
     get_data = make_item_list(date, details, 1)
     gross = get_data[1]
     data_ls = [
-        [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75]],
-        [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25]],
-        [GENERAL_LEDGER, 'Current Assets', ['', '', '', ['sales', trans_id, gross]]],
-        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross]]
+        [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75], True],
+        [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25], True],
+        [GENERAL_LEDGER, 'Current Assets', ['sales', trans_id, gross], False],
+        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross], True]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -629,9 +628,9 @@ def write_cr_purchase(itms, data, acct):
         get_data = make_item_list(date, itms, 2, 2)
     gross = float(get_data[1])
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross]],
-    [PAYABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'pdb', [date, account_no, price[0]]]
+    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross], True],
+    [PAYABLES, name, ['Invoice', gross, inv_no], True],
+    [ACCOUNTS, 'pdb', [date, account_no, price[0]], True]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -657,9 +656,9 @@ def write_dr_purchase(itms, data, acct):
         get_data = make_item_list(date, itms, 2, 2)
     gross = float(get_data[1])
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross]],
-    [PAYABLES, name, ['Invoice', gross, inv_no]],
-    [ACCOUNTS, 'pdb', [date, account_no, price[0]]]
+    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross], True],
+    [PAYABLES, name, ['Invoice', gross, inv_no], True],
+    [ACCOUNTS, 'pdb', [date, account_no, price[0]], True]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -727,13 +726,14 @@ def get_worksheet_titles(spreadsheet):
 
 
 
-
 def append_data(data_list):
-    """Appends data to specified sheet
+    """Updates specified sheet with data
 
     Args:
         data (list): list of data
-        [spreadsheet, worksheet, data]
+        [spreadsheet, worksheet, data, left?]
+            left: true if data is added to left side in accounts (Dr)
+                    false if added to right (Cr)
     """
     print('Reading data...')
     with ChargingBar('Writing data|', max=len(data_list)) as progress_bar:
@@ -742,7 +742,45 @@ def append_data(data_list):
             worksheet = data[1]
             data_to_write = data[2]
             sheet = spreadsheet.worksheet(worksheet)
-            sheet.append_row(data_to_write)
+            vals = sheet.get_all_values()[3:]
+            continue_loop = True
+            if data[3]:
+                vals.append(data_to_write[0:3])
+            else:
+                for val in vals:
+                    while True:
+                        if not val[3] and continue_loop:
+                            del val[3:]
+                            val.extend(data_to_write[3:])
+                            continue_loop = False
+                        break
+            sheet.update('A4:F', vals)
             progress_bar.next()
     print('Operation Successful.')
 
+def get_vals():
+    wsh = GENERAL_LEDGER.worksheet('Trade Payables')
+    vals = wsh.get_all_values()[3:]
+    new_vals = ['PL300', 'TEST3333', 14]
+    new_vals2 = ['PL400', 'TEST3433', 44]
+    continue_loop = True
+    print(vals)
+    for val in vals:
+        while True:
+            if not val[3] and continue_loop:
+                del val[3:]
+                val.extend(new_vals)
+                continue_loop = False
+            break
+    wsh.update('A4:F', vals)
+    continue_loop = True
+    print(vals)
+    for val in vals:
+        while True:
+            if not val[3] and continue_loop:
+                del val[3:]
+                val.extend(new_vals2)
+                continue_loop = False
+            break
+    wsh.update('A4:F', vals)
+    print(vals)
