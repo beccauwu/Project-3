@@ -181,13 +181,12 @@ def choose_customer():
     Returns:
         list: [account number, [address]]
     """
-    existing_customers = get_worksheet_titles(RECEIVABLES)
+    existing_customers = get_worksheet_titles(RECEIVABLES)[1:]
     last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
     num = 1
     for customer in existing_customers:
-        if customer != 'Base':
-            print(num, '', customer)
-            num += 1
+        print(num, '', customer)
+        num += 1
     while True:
         choise = int(input("Choose a customer: \n"))
         print("If adding a new customer, press 'n'\n")
@@ -203,7 +202,7 @@ def choose_customer():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
-            customer = existing_customers[choise]
+            customer = existing_customers[choise - 1]
             account_no = RECEIVABLES.worksheet(customer).acell('A1').value
             address_row = DATABASE.worksheet('addresses').find(customer).row
             address = DATABASE.worksheet('addresses').row_values(address_row)
@@ -219,7 +218,7 @@ def choose_supplier():
     Returns:
         list: [Supplier name, account no]
     """
-    existing_suppliers = get_worksheet_titles(PAYABLES)
+    existing_suppliers = get_worksheet_titles(PAYABLES)[1:]
     last_account_no = PAYABLES.worksheet(existing_suppliers[- 1]).acell('A1').value
     num = 1
     for supplier in existing_suppliers:
@@ -748,13 +747,13 @@ def append_data(data_list):
             vals = sheet.get_all_values()[3:]
             continue_loop = True
             if data[3]:
-                vals.append(data_to_write[0:3])
+                vals.append(data_to_write)
             else:
                 for val in vals:
                     while True:
                         if not val[3] and continue_loop:
                             del val[3:]
-                            val.extend(data_to_write[3:])
+                            val.extend(data_to_write)
                             continue_loop = False
                         break
             sheet.update('A4:F', vals)
