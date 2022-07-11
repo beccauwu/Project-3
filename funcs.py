@@ -189,13 +189,18 @@ def choose_customer():
         print(num, '', customer)
         num += 1
     while True:
-        choise = input("Choose a customer: \n")
-        print("If adding a new customer, press 'n'\n")
+        choise = input("Choose a customer (if adding a new customer, type 'n'): \n")
         if choise == 'n':
-            name = input('Customer name:')
+            name = input('Customer name:\n')
             new = new_account_number(last_account_no)
             new_worksheet(RECEIVABLES, '1255198903', name, new)
-            return [name, new]
+            print("Now let's add the customer address.\n")
+            street = input('Street name and house number:\n')
+            city = input('Postcode and city \n')
+            country = input('Country:\n')
+            address = [name, street, city, country]
+            append_data([DATABASE, 'addresses', address, True])
+            return [new, address]
         try:
             int(choise) < len(existing_customers)
         except TypeError as type_error:
@@ -226,12 +231,11 @@ def choose_supplier():
         print(num, '', supplier)
         num += 1
     while True:
-        choise = int(input("Choose a supplier: \n"))
-        print("If adding a new supplier, press 'n'\n")
+        choise = int(input("Choose a supplier (if adding a new customer, type 'n'): \n"))
         if choise == 'n':
-            name = input('Supplier name:')
+            name = input('Supplier name:\n')
             new = new_account_number(last_account_no)
-            new_worksheet(PAYABLES, name, new)
+            new_worksheet(PAYABLES, '1051717353', name, new)
             return [name, new]
         try:
             int(choise) < len(existing_suppliers)
@@ -663,7 +667,6 @@ def write_dr_purchase(itms, data, acct):
     for itm in get_data[0]:
         data_ls.append(itm)
     append_data(data_ls)
-    end()
 
 
 
@@ -679,9 +682,13 @@ def new_worksheet(spreadsheet, wsh_id, title, code):
         title (str): new worksheet title
         code (str): value of A1
     """
-    new_index = len(get_worksheet_titles(spreadsheet)) + 1
-    new_sheet = spreadsheet.duplicate_sheet(wsh_id, insert_sheet_index=new_index, new_sheet_name=title)
-    new_sheet.update('A1', code)
+    print('Generating new worksheet...')
+    try:
+        new_index = len(get_worksheet_titles(spreadsheet)) + 1
+        new_sheet = spreadsheet.duplicate_sheet(wsh_id, insert_sheet_index=new_index, new_sheet_name=title)
+        new_sheet.update('A1', code)
+    except Exception as e:
+        print(f'Something went wrong with writing the data {e}')
 
 def new_account_number(last):
     """Gets a new account number for new worksheets
@@ -692,11 +699,13 @@ def new_account_number(last):
     Returns:
         int: new number
     """
+    print('Generating account number...\n')
     code = last[0:2]
     num = int(''.join(c for c in last if c.isdigit()))
     num += 100
-    print(f"New account number is: RL{num}")
-    return f"{code}{num}"
+    new = f"{code}{num}"
+    print(f"New account number is: {new}")
+    return new
 
 def get_cell_val(ssh, wsh, cell):
     """Gets cell value from worksheet
