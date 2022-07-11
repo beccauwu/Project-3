@@ -272,8 +272,6 @@ def create_content(pdf_invoice_obj, itms:list):
         [Paragraph("Use reference:", price_bold),
         Paragraph(f"{pdf_invoice_obj.invoice_num}", price_normal)]
     ]
-    pprint([f"tbl1: {tbl1}, tbl2: {tbl2}"])
-    print(f"Rowheight: {rh}, space: {space}")
     tstyles = set_table_styles(tbl1, tbl2, rh)
     generate_pdf(inv_num, filename, vat_no, tstyles[0], tstyles[1], summary, space)
 

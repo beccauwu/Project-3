@@ -196,10 +196,11 @@ def choose_customer():
             new_worksheet(RECEIVABLES, '1255198903', name, new)
             print("Now let's add the customer address.\n")
             street = input('Street name and house number:\n')
-            city = input('Postcode and city \n')
+            city = input('City:\n')
+            postcode = input('Postcode:\n')
             country = input('Country:\n')
-            address = [name, street, city, country]
-            append_data([DATABASE, 'addresses', address, True])
+            address = [name, street, city, postcode, country]
+            append_data([[DATABASE, 'addresses', address, True]])
             return [new, address]
         try:
             int(choise) < len(existing_customers)
@@ -275,7 +276,7 @@ def how_many_items():
     items = []
     print('How many items will be added to the invoice?')
     while True:
-        choise = input('Type any number of products:')
+        choise = input('Type any number of products:\n')
         int_choise = int(choise)
         while int_choise > 0:
             items.append(product_menu())
@@ -361,7 +362,7 @@ def get_date():
         str: the date
     """
     while True:
-        date = input('Enter transaction date: (DDMMYYYY)')
+        date = input('Enter transaction date: (DDMMYYYY)\n')
         str(date)
         if check_if_date(date):
             return f"{date[0:2]}.{date[2:4]}.{date[4:8]}"
@@ -500,7 +501,7 @@ def is_item_in_list(lst, item):
             return True
     return False
 
-def make_item_list(date: str, items: list, ttype: int, extratype:int= None):
+def make_item_list(date: str, items: list, ttype: int, extratype:int= None, trans_id=None):
     """generates a list of products to add to list which is appended to spreadsheets
 
     Args:
@@ -521,13 +522,13 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None):
         if ttype == 1:
             stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount], True])
         if ttype == 2:
-            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount], True]) 
+            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount], True])
         if extratype == 1:
             stock_itms.append([GENERAL_LEDGER, 'Non-Current Assets',
-                           ['GL400', product, gross], False])
-    if extratype == 2:
-        stock_itms.append([GENERAL_LEDGER, 'Current Assets',
-                      ['GL400', 'Stock refill', gross], False])
+                           [product, trans_id, gross], False])
+        if extratype == 2:
+            stock_itms.append([GENERAL_LEDGER, 'Current Assets',
+                        [product, trans_id, gross], False])
     gross_total = float(sum(grosses))
     print(f"Gross total: {gross_total}")
     return [stock_itms, gross_total]
@@ -582,13 +583,12 @@ def write_cr_sale(data, stock_list):
     date = data[5]
     data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total], True],
-    [RECEIVABLES, name, ['Invoice', gross_total, inv_no], True],
+    [RECEIVABLES, name, ['Invoice', inv_no, gross_total], True],
     [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total], True]
     ]
     for itm in stock_list:
         data_ls.append(itm)
     append_data(data_ls)
-    end()
 
 def write_dr_sale(details: list, date: str):
     """passes transaction data to append_data
@@ -610,7 +610,6 @@ def write_dr_sale(details: list, date: str):
     for itm in get_data[0]:
         data_ls.append(itm)
     append_data(data_ls)
-    end()
 
 def write_cr_purchase(itms, data, acct):
     """passes transaction data to append_data
@@ -625,21 +624,21 @@ def write_cr_purchase(itms, data, acct):
     name = data[1]
     price = data[3:5]
     inv_no = data[5]
+    trans_id = get_trans_id('PC')
     date = data[0]
     if acct == 'Non-Current Assets':
-        get_data = make_item_list(date, itms, 2, 1)
+        get_data = make_item_list(date, itms, 2, 1, trans_id)
     else:
-        get_data = make_item_list(date, itms, 2, 2)
+        get_data = make_item_list(date, itms, 2, 2, trans_id)
     gross = float(get_data[1])
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross], True],
-    [PAYABLES, name, ['Invoice', gross, inv_no], True],
+    [GENERAL_LEDGER, 'Trade Payables', [account_no, trans_id, gross], True],
+    [PAYABLES, name, ['Invoice', inv_no, gross], True],
     [ACCOUNTS, 'pdb', [date, account_no, price[0]], True]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
     append_data(data_ls)
-    end()
 
 def write_dr_purchase(itms, data, acct):
     """passes transaction data to append_data
@@ -649,20 +648,18 @@ def write_dr_purchase(itms, data, acct):
         date (str): transaction date
     """
     print('Writing transaction data...')
-    account_no = data[2]
-    name = data[1]
     price = data[3:5]
-    inv_no = data[5]
+    trans_id = get_trans_id('PD')
     date = data[0]
     if acct == 'Non-Current Assets':
-        get_data = make_item_list(date, itms, 2, 1)
+        get_data = make_item_list(date, itms, 2, 1, trans_id)
     else:
-        get_data = make_item_list(date, itms, 2, 2)
+        get_data = make_item_list(date, itms, 2, 2, trans_id)
     gross = float(get_data[1])
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Payables', [account_no, inv_no, gross], True],
-    [PAYABLES, name, ['Invoice', gross, inv_no], True],
-    [ACCOUNTS, 'pdb', [date, account_no, price[0]], True]
+    [GENERAL_LEDGER, 'Sales Tax', ['Cash Purchase', trans_id, gross], False],
+    [GENERAL_LEDGER, 'Cash', ['Cash Purchase', trans_id, gross], False],
+    [ACCOUNTS, 'cash', [date, trans_id, price[0]], True]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -740,15 +737,18 @@ def append_data(data_list):
     """Updates specified sheet with data
 
     Args:
-        data (list): list of data
-        [[spreadsheet, worksheet, data, left?]]
-            spreadsheet (var): spreadsheet where worksheet is
-            worksheet (str): worksheet data is added to
-            data (list): list of data to write to worksheet
-            left? (bool): True if data is added to left side in accounts (Dr)
-                          False if added to right (Cr)
+        data_list (list): list of data
+            NOTE data always inside a list
+            syntax: [[spreadsheet, worksheet, data, left]]
+
+            * spreadsheet (var): spreadsheet where worksheet is
+            * worksheet (str): worksheet data is added to
+            * data (list): list of data to write to worksheet
+            * left (bool):
+                - True if data is added to left side in accounts (Dr)
+                - False if added to right (Cr)
     """
-    print('Reading data...')
+    print('Reading data...\n')
     with ChargingBar('Writing data|', max=len(data_list)) as progress_bar:
         for data in data_list:
             spreadsheet = data[0]

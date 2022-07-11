@@ -18,6 +18,7 @@ def upload_to_folder(filename):
     TODO(developer) - See https://developers.google.com/identity
     for guides on implementing OAuth2 for the application.
     """
+    print(f'Uploading file {filename} to drive...\n')
     creds, _ = google.auth.load_credentials_from_file('creds.json')
 
     try:
@@ -35,10 +36,8 @@ def upload_to_folder(filename):
         file = service.files().create(body=file_metadata, media_body=media,
                                       fields='id').execute()
         fileid = file.get('id')
-        print(F'File with ID: "{fileid}" has been added to the folder with '
-              F'ID "{folder_id}".')
-        end()
-
+        print('Operation completed.\n')
+        print(F'File: "{fileid}" has been added to folder: "{folder_id}".\n')
     except HttpError as error:
         print(F'An error occurred: {error}')
         file = None
