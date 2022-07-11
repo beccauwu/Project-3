@@ -183,17 +183,18 @@ def choose_customer():
     """
     existing_customers = get_worksheet_titles(RECEIVABLES)[1:]
     last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
+    print(f"last account number: {last_account_no}")
     num = 1
     for customer in existing_customers:
         print(num, '', customer)
         num += 1
     while True:
-        choise = int(input("Choose a customer: \n"))
+        choise = input("Choose a customer: \n")
         print("If adding a new customer, press 'n'\n")
         if choise == 'n':
             name = input('Customer name:')
             new = new_account_number(last_account_no)
-            new_worksheet(RECEIVABLES, name, new)
+            new_worksheet(RECEIVABLES, '1255198903', name, new)
             return [name, new]
         try:
             int(choise) < len(existing_customers)
@@ -202,7 +203,7 @@ def choose_customer():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
-            customer = existing_customers[choise - 1]
+            customer = existing_customers[int(choise) - 1]
             account_no = RECEIVABLES.worksheet(customer).acell('A1').value
             address_row = DATABASE.worksheet('addresses').find(customer).row
             address = DATABASE.worksheet('addresses').row_values(address_row)
@@ -669,16 +670,17 @@ def write_dr_purchase(itms, data, acct):
 
 #gspread stuff
 
-def new_worksheet(spreadsheet, title, code):
+def new_worksheet(spreadsheet, wsh_id, title, code):
     """creates a new worksheet using a base template
 
     Args:
         spreadheet (const): spreadsheet to add to
+        wsh_id (str): id for worksheet to duplicate
         title (str): new worksheet title
         code (str): value of A1
     """
-    new_sheet = spreadsheet.duplicate_sheet('Base')
-    new_sheet.update_title(title)
+    new_index = len(get_worksheet_titles(spreadsheet)) + 1
+    new_sheet = spreadsheet.duplicate_sheet(wsh_id, insert_sheet_index=new_index, new_sheet_name=title)
     new_sheet.update('A1', code)
 
 def new_account_number(last):
@@ -692,7 +694,7 @@ def new_account_number(last):
     """
     code = last[0:2]
     num = int(''.join(c for c in last if c.isdigit()))
-    num += 10
+    num += 100
     print(f"New account number is: RL{num}")
     return f"{code}{num}"
 
