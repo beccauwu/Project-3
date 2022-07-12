@@ -1,3 +1,4 @@
+import time
 from funcs import *
 
 def start():
@@ -118,5 +119,25 @@ def list_sum(numlist):
     new_list = [int(num) for num in numlist]
     return sum(new_list)
 
+def first():
+    """
+    Prints out project logo as text and waits for 2 seconds
+    """
+    lines = [
+        ':        .',
+        ':       / \  /\  .',
+        ':      /   \/  \/ \  .——>',
+        ':     /          __\/',
+        ':    /      __  |  |',
+        ':   /  __  |  | |  |',
+        ':  /  |  | |  | |  |',
+        ': /   |  | |  | |  |',
+        ':/    |  | |  | |  |',
+        '*************************'
+    ]
+    for line in lines:
+        print(line)
+    time.sleep(2)
+    start()
 
-start()
+first()

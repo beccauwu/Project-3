@@ -1,4 +1,5 @@
 from random import randint
+from turtle import position
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
@@ -232,7 +233,7 @@ def choose_supplier():
         print(num, '', supplier)
         num += 1
     while True:
-        choise = int(input("Choose a supplier (if adding a new customer, type 'n'): \n"))
+        choise = input("Choose a supplier (if adding a new customer, type 'n'): \n")
         if choise == 'n':
             name = input('Supplier name:\n')
             new = new_account_number(last_account_no)
@@ -245,7 +246,7 @@ def choose_supplier():
         except ValueError as value_error:
             print(f"Chosen value {value_error} is not valid, please try again")
         else:
-            supplier = existing_suppliers[choise - 1]
+            supplier = existing_suppliers[int(choise) - 1]
             account_no = PAYABLES.worksheet(supplier).acell('A1').value
             print(f"{supplier} chosen. Proceeding.")
             return [supplier, account_no]
@@ -757,9 +758,23 @@ def append_data(data_list):
             sheet = spreadsheet.worksheet(worksheet)
             vals = sheet.get_all_values()[3:]
             continue_loop = True
-            if data[3]:
-                vals.append(data_to_write)
-            else:
+            pos = 0
+            if data[3] and len(vals) != 0:
+                if not vals[len(vals)-1][0]:
+                    for val in vals:
+                        if val[0] and val[3] and continue_loop:
+                            continue
+                        if not val[0] and continue_loop:
+                            del val[0:3]
+                            for new in data_to_write:
+                                val.insert(pos, new)
+                                pos += 1
+                            continue_loop = False
+                            break
+                        break
+                else:
+                    vals.append(data_to_write)
+            elif len(vals) != 0:
                 for val in vals:
                     while True:
                         if not val[3] and continue_loop:
@@ -767,6 +782,47 @@ def append_data(data_list):
                             val.extend(data_to_write)
                             continue_loop = False
                         break
-            sheet.update('A4:F', vals)
+            elif data[3]:
+                vals.append(data_to_write)
+            else:
+                new_row = ['','','']
+                new_row.extend(data_to_write)
+                vals.append(new_row)
+            sheet.update('A4:J', vals)
             progress_bar.next()
     print('Operation Successful.')
+
+def product_stock_amount():
+    """Gets amounts of products in stock
+    """
+    worksheets = get_worksheet_titles(STOCK)[1:]
+    for worksheet in worksheets:
+        wsh = STOCK.worksheet(worksheet)
+        stock_amount = wsh.acell('J3').value
+        print(f'{worksheet}: {stock_amount} in stock')
+
+def current_profit_margin():
+    """Calculates profit margins for individual products and
+    the total profit margin
+    """
+    worksheets = get_worksheet_titles(STOCK)[1:]
+    bought_vals = []
+    sold_vals = []
+    for worksheet in worksheets:
+        wsh = STOCK.worksheet(worksheet)
+        bought_val = float(wsh.acell('K3').value)
+        sold_val = float(wsh.acell('L3').value)
+        bought_vals.append(bought_val)
+        sold_vals.append(sold_val)
+        product_profit_margin = round(float(sold_val / bought_val * 100), 2)
+        print(f'Value of sold {worksheet}s: {sold_val}')
+        print(f'Value of bought {worksheet}s: {bought_val}')
+        print(f'{worksheet} profit margin: {product_profit_margin}%\n')
+    total_bought = sum(bought_vals)
+    total_sold = sum(sold_vals)
+    profit_margin = round(float(total_sold / total_bought * 100), 2)
+    print(f'Total value of sold products: {total_sold}')
+    print(f'Total value of bought products: {total_bought}')
+    print(f'Total profit margin: {profit_margin}%\n')
+
+append_data([[STOCK, 'NaOH', ['test', 'test2', 'test3'], False]])
