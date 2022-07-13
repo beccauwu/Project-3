@@ -1,5 +1,4 @@
 from random import randint
-from turtle import position
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
@@ -521,9 +520,9 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None, tran
         gross = float(get_gross_total(product, amount))
         grosses.append(gross)
         if ttype == 1:
-            stock_itms.append([STOCK, product, [date, '', amount, gross, gross/amount], True])
+            stock_itms.append([STOCK, product, [date, amount, gross], False])
         if ttype == 2:
-            stock_itms.append([STOCK, product, [date, amount, '', gross, gross/amount], True])
+            stock_itms.append([STOCK, product, [date, amount, gross], True])
         if extratype == 1:
             stock_itms.append([GENERAL_LEDGER, 'Non-Current Assets',
                            [product, trans_id, gross], False])
@@ -641,7 +640,7 @@ def write_cr_purchase(itms, data, acct):
         data_ls.append(itm)
     append_data(data_ls)
 
-def write_dr_purchase(itms, data, acct):
+def write_dr_purchase(itms, date, acct):
     """passes transaction data to append_data
 
     Args:
@@ -649,9 +648,7 @@ def write_dr_purchase(itms, data, acct):
         date (str): transaction date
     """
     print('Writing transaction data...')
-    price = data[3:5]
     trans_id = get_trans_id('PD')
-    date = data[0]
     if acct == 'Non-Current Assets':
         get_data = make_item_list(date, itms, 2, 1, trans_id)
     else:
@@ -660,7 +657,7 @@ def write_dr_purchase(itms, data, acct):
     data_ls = [
     [GENERAL_LEDGER, 'Sales Tax', ['Cash Purchase', trans_id, gross], False],
     [GENERAL_LEDGER, 'Cash', ['Cash Purchase', trans_id, gross], False],
-    [ACCOUNTS, 'cash', [date, trans_id, price[0]], True]
+    [ACCOUNTS, 'cash', [date, trans_id, gross], True]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -681,12 +678,10 @@ def new_worksheet(spreadsheet, wsh_id, title, code):
         code (str): value of A1
     """
     print('Generating new worksheet...')
-    try:
-        new_index = len(get_worksheet_titles(spreadsheet)) + 1
-        new_sheet = spreadsheet.duplicate_sheet(wsh_id, insert_sheet_index=new_index, new_sheet_name=title)
-        new_sheet.update('A1', code)
-    except Exception as e:
-        print(f'Something went wrong with writing the data {e}')
+    new_index = len(get_worksheet_titles(spreadsheet)) + 1
+    new_sheet = spreadsheet.duplicate_sheet(wsh_id,
+                                            insert_sheet_index=new_index, new_sheet_name=title)
+    new_sheet.update('A1', code)
 
 def new_account_number(last):
     """Gets a new account number for new worksheets
@@ -716,8 +711,8 @@ def get_cell_val(ssh, wsh, cell):
     Returns:
         str: cell calue
     """
-    cv = ssh.worksheet(wsh).acell(cell).value
-    return cv
+    cell_val = ssh.worksheet(wsh).acell(cell).value
+    return cell_val
 
 def get_worksheet_titles(spreadsheet):
     """
@@ -824,5 +819,3 @@ def current_profit_margin():
     print(f'Total value of sold products: {total_sold}')
     print(f'Total value of bought products: {total_bought}')
     print(f'Total profit margin: {profit_margin}%\n')
-
-append_data([[STOCK, 'NaOH', ['test', 'test2', 'test3'], False]])

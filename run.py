@@ -1,5 +1,5 @@
 import time
-from funcs import *
+import funcs
 
 def start():
     """
@@ -42,15 +42,15 @@ def sale():
     """
     Menu for accounting sales
     """
-    details = how_many_items()
-    date = get_date()
-    trans_type = cash_or_credit('Sale')
+    details = funcs.how_many_items()
+    date = funcs.get_date()
+    trans_type = funcs.cash_or_credit('Sale')
     if trans_type == 1:
-        customer = choose_customer()
-        sort_cr_sale_data(details, date, customer)
+        customer = funcs.choose_customer()
+        funcs.sort_cr_sale_data(details, date, customer)
 
     elif trans_type == 2:
-        write_dr_sale(details, date)
+        funcs.write_dr_sale(details, date)
 
 
 
@@ -58,35 +58,35 @@ def purchase():
     """
     Menu for accounting purchases
     """
-    details = purchases_menu()
+    details = funcs.purchases_menu()
     products = details[0]
-    date = get_date()
-    trans_type = cash_or_credit('Purchase')
+    date = funcs.get_date()
+    trans_type = funcs.cash_or_credit('Purchase')
     net_price = input('Enter the net price of purchase:')
     gross_price = input('Enter the gross price of purchase:')
     if trans_type == 1:
-        supplier = choose_supplier()
+        supplier = funcs.choose_supplier()
         invoice_num = input('Enter the invoice number:')
-        write_cr_purchase(products,
-                          [date, supplier[0], supplier[1], net_price, gross_price, invoice_num], details[1])
+        data = [date, supplier[0], supplier[1], net_price, gross_price, invoice_num]
+        funcs.write_cr_purchase(products, data, details[1])
     elif trans_type == 2:
-        write_dr_purchase(details, date)
+        funcs.write_dr_purchase(products, date, details[1])
 
 def sales_receipt():
     """
     registers sales receipts
     """
-    customer = choose_customer()
-    data = sales_receipts_menu(customer[1][0], customer[0])
-    register_sales_receipt(data)
+    customer = funcs.choose_customer()
+    data = funcs.sales_receipts_menu(customer[1][0], customer[0])
+    funcs.register_sales_receipt(data)
 
 def purchase_payments():
     """
     registers purchase payments
     """
-    supplier = choose_supplier()
-    data = purchase_payments_menu(supplier[0], supplier[1])
-    register_purchase_payment(data)
+    supplier = funcs.choose_supplier()
+    data = funcs.purchase_payments_menu(supplier[0], supplier[1])
+    funcs.register_purchase_payment(data)
 
 def yes_or_no(question):
     """
@@ -124,20 +124,20 @@ def first():
     Prints out project logo as text and waits for 2 seconds
     """
     lines = [
-        ':        .',
-        ':       / \  /\  .',
-        ':      /   \/  \/ \  .——>',
-        ':     /          __\/',
-        ':    /      __  |  |',
-        ':   /  __  |  | |  |',
-        ':  /  |  | |  | |  |',
-        ': /   |  | |  | |  |',
-        ':/    |  | |  | |  |',
-        '*************************'
+        '               :        .',
+        '               :       / \  /\  .',
+        '               :      /   \/  \/ \  .——>',
+        '               :     /          __\/',
+        '               :    /      __  |  |',
+        '               :   /  __  |  | |  |',
+        '               :  /  |  | |  | |  |',
+        '               : /   |  | |  | |  |',
+        '               :/    |  | |  | |  |',
+        '               *************************\n'
     ]
     for line in lines:
         print(line)
-    time.sleep(2)
+        time.sleep(0.1)
     start()
 
 first()

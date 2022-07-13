@@ -1,6 +1,6 @@
 <body id="readme">
 <div id="top"></div>
-<div class="center">
+<div align="center">
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
@@ -15,21 +15,21 @@
 <br />
 <div align="center">
   <a href="https://rugged-kings-canyon-79210.herokuapp.com/">
-    <img src="assets/images/icon.png" alt="Logo" width="250" height="250">
+    <img src="assets/img/logotransparent.png" alt="Logo" width="250" height="250">
   </a>
 
-<h3 align="center">Portfolio Project 2 - Javascript</h3>
+<h3 align="center">Accountspy Preview</h3>
 
   <p align="center">
-    The classic snake game as a web game.
+    An accounting application in python
     <br />
-    <a href="https://beccauwu.github.io/snake/"><strong>Visit the site »</strong></a>
+    <a href="https://rugged-kings-canyon-79210.herokuapp.com/"><strong>Try the app online</strong></a>
     <br />
     <br />
     ·
-    <a href="https://github.com/beccauwu/snake/issues">Report Bug</a>
+    <a href="https://github.com/beccauwu/accountspy-preview/issues">Report Bug</a>
     ·
-    <a href="https://github.com/beccauwu/snake/issues">Request Feature</a>
+    <a href="https://github.com/beccauwu/accountspy-preview/issues">Request Feature</a>
   </p>
 </div>
 
@@ -41,18 +41,19 @@
   <ul id="table-of-contents">
     <li><a href="#introduction">1. Introduction</a></li>
     <li>
-      <a href="#styling">2. Site Styling</a>
+      <a href="#styling">2. Functionality in detail</a>
       <ul>
         <li>
-          <a href="#colours-and-fonts">2.1. Colours and Fonts</a>
+          <a href="#colours-and-fonts">2.1. Recording a sale</a>
         </li>
         <li>
-        <a href="#pages">2.2 Pages</a>
-          <ul class="smallest">
-            <li><a href="#footer">2.2.1. Footer</a></li>
-            <li><a href="#index">2.2.2. Index</a></li>
-            <li><a href="#snake">2.2.2. Snake</a></li>
-          </ul>
+        <a href="#pages">2.2 Recording a purchase</a>
+        </li>
+        <li>
+        <a href="#pages">2.2 Recording a sales receipt</a>
+        </li>
+        <li>
+        <a href="#pages">2.2 Recording a purchase payment</a>
         </li>
       </ul>
     </li>
@@ -76,31 +77,51 @@
 <!-- Introduction -->
 <h2 id="introduction">1. Introduction</h2>
 
-[![Product Name Screen Shot][product-screenshot]](https://beccauwu.github.io/snake)
+[![Product Name Screen Shot][product-screenshot]](https://beccauwu.github.io/accountspy-preview)
 
-This site is a web game for the classic Snake-game popular from Nokia phones. The site is divided into 2 pages - the index page and the actual game page.
-I chose to go with this particular game since as a Finnish person myself I naturally grew up surrounded with Nokia phones (and rubber boots). Snake in particular, though simple, is definitely one of my favourite games to kill time with. I wanted to have the chance to share the nostalgia with others.
+Accountspy Preview is a demo app for a fully functioning and configurable accounting app I will make in the future.
+
+**Features:**
+* Post sales/purchases data into relevant general ledger accounts/control accounts
+* Register receipts/payments for credit transactions
+* Show current stock balance for products sold
+* Calculate profit margins for products as well as total
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- Styling -->
-<h2 id="styling">2. Site Styling</h2>
+<h2 id="styling">2. Features in detail</h2>
 
-Here I will go through all the different design choices and talk about what implications they are designed to have on user experience. As a general note here in the beginning, it would be important to stress that usability has been the top priority in creating the site and thorough testing has been done to see potential flaws and fix them.
+Upon starting the app, the user is prompted with the 4 options below. I will now explain what happens 'behind the scenes' with each of the options.
 
-<h3 id="colours-and-fonts"> 2.1. Colours and Fonts</h3>
+<h3 id="colours-and-fonts"> 2.1. Recording sales transactions</h3>
 
-**Colours**
+When selecting 1 on the start menu, the user is prompted to enter the number of different products sold (the predefined products for the demo being soap bars, liquid soap, coconut oil and sodium hydroxide). 
+I decided for the purposes of the demo make the imagined business a soap store which also sells the basic ingredients for soap making (oil and an alcaline substance).
 
-![Site colour scheme][colours]
+After choosing the number of products, the user will then choose for each product the product and the amount sold. 
+The price for each product is predefined:
+* Soap bar: 6€
+* Liquid soap: €
+* Coconut oil: €
+* Sodium hydroxide: €
 
-As the site is based on an old game, I chose to go with colours that also reflect this. The main colours of the game are red, green and yellow. The index page also has purple text for its H2 elements to enhance readability.
+After entering the products and the amounts, the transaction date is entered in the format (ddmmyyyy), then the user chooses the type of transaction (credit/cash):
 
-The colour of the snake is red, and the canvas background colour is grey to make the canvas stand out from the body's very dark almost black colour. The food is green to make it stand out in relation to the snake. All elements with text on the page have the same grey background as the canvas to be consistent, with varying colours of text to add diversity and an 'old feel' to it.
+**Credit sales**
 
-The border colours of elements are always different from the colour of the containing text - if the text is yellow or red, the border is green, if the text inside an element is both yellow and green, the border is red.
+When registering a credit sale, the user is prompted with existing customers of the business, with the option of adding a customer if they haven't bought with credit before.
+After the customer is chosen, the app generates a random transaction ID as well as a random invoice ID, which are used as references when posting the data to relevant accounts. More details on the accounts can be found below.
+When the data is in the accounts, an invoice is generated as a PDF which is uploaded to the invoices folder within the project's Google Drive folder.
 
-**Fonts**
+**Accounts:**
+
+* Books of prime entry: Sales day book
+* General Ledger: (Dr) Sales, (Cr) Current Assets, (Cr) Trade Receivables
+* Receivables Ledger: (Dr) Customer account
+* Inventory: (Cr) Accounts of products sold
+
+**Cash sales**
 
 The main font used is a monospace called Source Code Pro. It being a monospace follows the old theme of the site. A Sans Serif font, Ubuntu is used on the index page where there is more text content to make it easier read.
 
@@ -118,17 +139,17 @@ The footer is a simple copyright notice.
 
 Upon landing onto the index page, the user is presented with the introduction to the game. Here the user can click through the text either using the arrows or the numbered buttons. The two pages, apart from the first page, are each there to explain the basics of the game - rules and controls. 
 
-There are only two rules, I primarily wanted to specify that in contrast to many other snake games, the game does not end when the snake hits the wall. The second rule is sort of obvious if you've seen the game before, so I just wanted to make a joke out of it.
+There are only two rules, I primarily wanted to specify that in contrast to many other accountspy-preview games, the game does not end when the accountspy-preview hits the wall. The second rule is sort of obvious if you've seen the game before, so I just wanted to make a joke out of it.
 
 On the page explaining the controls for the game I also added a mention of the leaderboard for the game, and challenged the user to try to beat the persons on there.
 
 The user has the opportunity to skip the introduction and continue straight to the game if desired.
 
-<h4 id="snake">2.2.3. Snake</h4>
+<h4 id="accountspy-preview">2.2.3. Snake</h4>
 
 **Gameplay**
 
-The objective of the game is to get as high of a score as possible by eating "fruits", the green blocks appearing on the canvas. Every time the snake eats a fruit it grows one block, the score increases by 10, and the speed of the snake increases. The game ends when the snake collides with itself, which becomes increasingly difficult to avoid the longer you play. 
+The objective of the game is to get as high of a score as possible by eating "fruits", the green blocks appearing on the canvas. Every time the accountspy-preview eats a fruit it grows one block, the score increases by 10, and the speed of the accountspy-preview increases. The game ends when the accountspy-preview collides with itself, which becomes increasingly difficult to avoid the longer you play. 
 
 ![Leaderboard at game end][dead]
 
@@ -157,7 +178,7 @@ The controls on a PC are the keys WASD – W to move up, A to move left, S to mo
 ![Controls capture][controls]
 
 Another option for controlling the game is through a D-pad, where the arrow keys change the movement direction, and the middle control button toggles pausing.  
-When the game is resumed from pause, there is a 3-second countdown for it to start again, to give time for the user to get prepared, which can be especially important at higher scores due to the increasing speed every time the snake eats.
+When the game is resumed from pause, there is a 3-second countdown for it to start again, to give time for the user to get prepared, which can be especially important at higher scores due to the increasing speed every time the accountspy-preview eats.
 
 <h2 id="testing">3. Testing</h2>
 
@@ -185,7 +206,7 @@ Fix: Round the output of adaptive style into the nearest 10-number
 
 **Persistent**
 
-Bug: When pressing two buttons too quickly after each other, it may cause the snake to turn on itself and thus ending the game. This bug really only affects PC players, it isn’t possible to click the D-pad buttons fast enough to make this happen.
+Bug: When pressing two buttons too quickly after each other, it may cause the accountspy-preview to turn on itself and thus ending the game. This bug really only affects PC players, it isn’t possible to click the D-pad buttons fast enough to make this happen.
 
 
 <h2 id="deployment">5. Deployment</h2>
@@ -197,7 +218,7 @@ I deployed the page on GitHub pages via the following procedure:
 3. Under the Source section, select the Main branch from the drop-down menu and click Save.
 4. A message will be displayed to indicate a successful deployment to GitHub pages and provide the live link.
 
-You can find the live site via the following URL - [Snake live webpage](https://beccauwu.github.io/snake)
+You can find the live site via the following URL - [Snake live webpage](https://beccauwu.github.io/accountspy-preview)
 
 <h2 id="future-enhancements">6. Future Enhancements</h2>
 
@@ -217,7 +238,7 @@ In the future I am planning to implement different user configurable settings fo
 
 Rebecca Perttula - [@uwuphoto](https://twitter.com/uwuphoto) - rebecca@perttula.co
 
-Project Link: [https://beccauwu.github.io/snake](https://beccauwu.github.io/snake)
+Project Link: [https://beccauwu.github.io/accountspy-preview](https://beccauwu.github.io/accountspy-preview)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -233,13 +254,13 @@ Project Link: [https://beccauwu.github.io/snake](https://beccauwu.github.io/snak
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/beccauwu/snake.svg?style=for-the-badge
+[contributors-shield]: https://img.shields.io/github/contributors/beccauwu/accountspy-preview.svg?style=for-the-badge
 [contributors-url]: https://github.com/beccauwu/my-site/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/beccauwu/snake.svg?style=for-the-badge
+[forks-shield]: https://img.shields.io/github/forks/beccauwu/accountspy-preview.svg?style=for-the-badge
 [forks-url]: https://github.com/beccauwu/my-site/network/members
-[stars-shield]: https://img.shields.io/github/stars/beccauwu/snake.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/beccauwu/accountspy-preview.svg?style=for-the-badge
 [stars-url]: https://github.com/beccauwu/my-site/stargazers
-[issues-shield]: https://img.shields.io/github/issues/beccauwu/snake.svg?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/beccauwu/accountspy-preview.svg?style=for-the-badge
 [issues-url]: https://github.com/beccauwu/my-site/issues
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/rebeccaperttula
