@@ -596,7 +596,7 @@ def write_cr_sale(data, stock_list):
     """
     name = data[0]
     account_no = data[1]
-    gross_total = data[2]
+    gross_total = float(data[2])
     trans_id = data[3]
     inv_no = data[4]
     data_ls = [
@@ -617,10 +617,10 @@ def write_dr_sale(details: list, date: str):
     """
     trans_id = get_trans_id('SD')
     get_data = make_item_list(date, details, 1)
-    gross = get_data[1]
+    gross = float(get_data[1])
     data_ls = [
-        [GENERAL_LEDGER, 'Cash', ['cash sale', trans_id, gross * 0.75], True],
-        [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25], True],
+        [GENERAL_LEDGER, 'Cash', ['cash sale', trans_id, float(gross * 0.75)], True],
+        [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, float(gross * 0.25)], True],
         [GENERAL_LEDGER, 'Current Assets', ['Cash sales', trans_id, gross], False]
     ]
     for itm in get_data[0]:

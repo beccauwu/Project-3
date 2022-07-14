@@ -184,29 +184,24 @@ When the game is resumed from pause, there is a 3-second countdown for it to sta
 
 <h3 id="methods">3.1. Methodology and Results</h3>
 
-All of the pages have been thoroughly tested by individuals as well as using software such as ARC and Lighthouse. The user feedback has been positive, without any major suggestions for improvement. Both softwares showed some issues, which have been solved as well as they possibly could have been using the already existing site framework. The CSS and HTML have been passed through the W3C validation service, and the JavaScript has been passed through JSHint without errors.
+All the app functionality has been tested thoroughly and the code has been passed through pylint without issues.
 
-![Lighthouse results][lighthouse]
-
-<h3 id="issues">3.2. Issues During Testing</h3>
-
-Both ARC and Lighthouse flagged the contrast ratio of the red text on the dark background in various places. This has been combatted by increasing the font size and weight where needed. It is still being flagged but is fully readable through various colour blindness filters. Multiple-user testing has also not yielded any negative reviews on this.
 
 <h2 id="bugs">4. Bugs</h2>
 
 **Fixed**
 
-Bug: Snake marked as dead when game was paused
+Bug: App appended a line in the spreadsheet it was writing to instead of writing on the same line as the existing text was on.
 
-Fix: Declare a variable, which is false when game is paused, and the function for game end won’t check for death.
+Fix: Modify function that adds to sheet, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replaces the original values.
 
-Bug: Responsive canvas size ended up creating odd-numbered sizes
+Bug: When generating a transaction ID the app got stuck in a loop
 
-Fix: Round the output of adaptive style into the nearest 10-number
+Fix: Change indentation of the return statement inside function
 
 **Persistent**
 
-Bug: When pressing two buttons too quickly after each other, it may cause the accountspy-preview to turn on itself and thus ending the game. This bug really only affects PC players, it isn’t possible to click the D-pad buttons fast enough to make this happen.
+Bug: 
 
 
 <h2 id="deployment">5. Deployment</h2>
