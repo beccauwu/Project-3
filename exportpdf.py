@@ -82,6 +82,8 @@ def generate_pdf(invoice_num, filename, vat_no, tbl_one, tbl_two, summary, sammo
     ]
     footers = [
         Paragraph("E&OE", footer_first),
+        Paragraph('Email: <a href="mailto:test@gmail.com">test@gmail.com</a>', footer_first),
+        Paragraph('Phone: <a href="tel:010101010">010101010</a>', footer_first),
         Paragraph("Business is registered for VAT:", footer_first),
         Paragraph(vat_no, footer_second)
     ]
@@ -94,7 +96,7 @@ def generate_pdf(invoice_num, filename, vat_no, tbl_one, tbl_two, summary, sammo
     SimpleDocTemplate(filename, pagesize=A4,
                         rightMargin=12, leftMargin=12,
                         topMargin=12, bottomMargin=6).build(pdf_content)
-    upload_to_folder(filename)
+    #upload_to_folder(filename)
 
 def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     """
@@ -102,29 +104,16 @@ def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     them then onto create_content
     """
     items = []
-    creator = Creator('Test User', 'test@gmail.com', '098912312','DE1921 3210 9381 8211', 'SE00000000001')
+    creator = Creator('Test User', 'test@gmail.com', '098912312','FI01 0000 0000 0000 0000', 'SE00000000001')
     customer = Customer(name, address[0], address[1], address[2], address[3].upper())
     file = File(f"{inv_num}.pdf", 12, 5)
-    print("""
-          ---Customer Type---
-          1. Private
-          2. Business
-          """)
-    while True:
-        choise = input('Choose customer type:')
-        if choise == '1':
-            for order in orders:
-                item = set_invoice_data_private(order[0], order[1], order[2])
-                items.append(item)
-        if choise == '2':
-            for order in orders:
-                item = set_invoice_data_business(order[0], order[1], order[2])
-                items.append(item)
-        pdf_inv = PdfInvoice(date, due_date(date), inv_num, ref_num, creator, customer, file)
-        create_content(pdf_inv, items)
-        break
+    for order in orders:
+        item = set_invoice_data(order[0], order[1], order[2])
+        items.append(item)
+    pdf_inv = PdfInvoice(date, due_date(date), inv_num, ref_num, creator, customer, file)
+    create_content(pdf_inv, items)
 
-def set_invoice_data_private(itm, amount, gross):
+def set_invoice_data(itm, amount, gross):
     """Sets invoice data for private purchases
 
     Args:
@@ -141,29 +130,6 @@ def set_invoice_data_private(itm, amount, gross):
     nt_tot = str(round(float(gr_tot * 0.75), 2))
     tx_tot = str(round(float(gr_tot * 0.25), 2))
     inv_data = InvData(amount, itm, gr_tot, nt_per_one, nt_tot, tx_tot)
-    return inv_data
-
-def set_invoice_data_business(amount, itm, gross):
-    """sets invoice data for business purchases -
-    checks if business is excempt from vat and adjusts amounts
-    accordingly
-
-    Args:
-        amount (int): amount of items ordered
-        itm (str): item ordered
-        gross (float): total price for item
-
-    Returns:
-        var: order info inside a namedtuple
-    """
-    gr_tot = float(gross)*float(amount)
-    nt_per_one = str(round(float(gross * 0.75), 2))
-    nt_tot = str(round(float(gr_tot * 0.75), 2))
-    tx_tot = str(round(float(gr_tot * 0.25), 2))
-    if vat_excempt():
-        inv_data = InvData(amount, itm, nt_tot, nt_per_one, nt_tot, 0)
-    else:
-        inv_data = InvData(amount, itm, gr_tot, nt_per_one, nt_tot, tx_tot)
     return inv_data
 
 def due_date(date):
@@ -186,19 +152,6 @@ def due_date(date):
     if int(date[3]) == 1:
         return f"{date[0:2]}.01.{date[6:8]}{int(date[8]) + 1}0"
 
-def vat_excempt():
-    """checks if business is vat excempt
-
-    Returns:
-        boolean: true if is, false if not
-    """
-    while True:
-        choise = input("Is the customer VAT excempt? (y/n)\n")
-        if choise in ('y', 'Y'):
-            return True
-        if choise in ('n', 'N'):
-            return False
-        print('Invalid choise, please try again')
 
 def create_content(pdf_invoice_obj, itms:list):
     """creates tables for invoice based on ordered items
