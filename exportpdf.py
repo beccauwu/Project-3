@@ -1,4 +1,5 @@
 from collections import namedtuple
+from progress.bar import ChargingBar
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import A4
@@ -86,16 +87,22 @@ def generate_pdf(invoice_num, filename, vat_no, tbl_one, tbl_two, summary, sammo
         Paragraph("Business is registered for VAT:", footer_first),
         Paragraph(vat_no, footer_second)
     ]
-    for header in headers:
-        pdf_content.append(header)
-    for main in main_contents:
-        pdf_content.append(main)
-    for footer in footers:
-        pdf_content.append(footer)
-    SimpleDocTemplate(filename, pagesize=A4,
-                        rightMargin=12, leftMargin=12,
-                        topMargin=12, bottomMargin=6).build(pdf_content)
-    upload_to_folder(filename)
+    with ChargingBar('Creating Invoice|',
+                     max=len(headers)+len(main_contents)+len(footers)+1) as progress_bar:
+        for header in headers:
+            pdf_content.append(header)
+            progress_bar.next()
+        for main in main_contents:
+            pdf_content.append(main)
+            progress_bar.next()
+        for footer in footers:
+            pdf_content.append(footer)
+            progress_bar.next()
+        SimpleDocTemplate(filename, pagesize=A4,
+                            rightMargin=12, leftMargin=12,
+                            topMargin=12, bottomMargin=6).build(pdf_content)
+        progress_bar.next()
+        upload_to_folder(filename)
 
 def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     """
@@ -111,7 +118,6 @@ def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
         items.append(item)
     pdf_inv = PdfInvoice(date, due_date(date), inv_num, ref_num, creator, customer, file)
     create_content(pdf_inv, items)
-
 def set_invoice_data(itm, amount, gross):
     """Sets invoice data for private purchases
 

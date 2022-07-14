@@ -205,7 +205,7 @@ def choose_customer():
     last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
     num = 1
     for customer in existing_customers:
-        print(num, '', customer)
+        print(f"{num}. {customer}")
         num += 1
     while True:
         choise = input("Choose a customer (if adding a new customer, type 'n'): \n")
@@ -246,7 +246,7 @@ def choose_supplier():
     last_account_no = PAYABLES.worksheet(existing_suppliers[- 1]).acell('A1').value
     num = 1
     for supplier in existing_suppliers:
-        print(num, '', supplier)
+        print(f"{num}. {supplier}")
         num += 1
     while True:
         choise = input("Choose a supplier (if adding a new customer, type 'n'): \n")

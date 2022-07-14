@@ -110,23 +110,23 @@ When recording purchase transactions, the process is largely similar to sales tr
 
 * Collections
 
-Namedtuple from Collections is used for data management when creating an invoice.
+    Namedtuple from Collections is used for data management when creating an invoice.
 
 * Google Drive API
 
-Google Drive API is used to upload files to Google Drive.
+    Google Drive API is used to upload files to Google Drive.
 
 * GSpread
 
-Gspread is used to update worksheets with data and creating worksheets.
+    Gspread is used to update worksheets with data and creating worksheets.
 
 * Progress
 
-ChargingBar from Progress is used to provide feedback on the sometimes slow updates to worksheets.
+    ChargingBar from Progress is used to provide feedback on the sometimes slow updates to worksheets.
 
 * Reportlab
 
-Reportlab is used for generating invoices as PDF files.
+    Reportlab is used for generating invoices as PDF files.
 
 
 <h2 id="testing">3. Testing</h2>
