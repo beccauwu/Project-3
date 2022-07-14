@@ -1,5 +1,3 @@
-from pprint import pprint
-import webbrowser
 from collections import namedtuple
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT

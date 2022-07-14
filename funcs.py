@@ -13,7 +13,6 @@ SCOPE = [
 CREDS = Credentials.from_service_account_file('creds.json')
 SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
-ACCOUNTS = GSPREAD_CLIENT.open('accounts')
 PAYABLES = GSPREAD_CLIENT.open('payables')
 RECEIVABLES = GSPREAD_CLIENT.open('receivables')
 GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
@@ -44,7 +43,7 @@ def product_menu():
             print("\033c")
             return ['Soap Bar', products]
         if choise == '2':
-            products = how_many(input("How many bottles"))
+            products = how_many(input("How many bottles\n"))
             print(f"Got it. {products} bottles of soap")
             print("\033c")
             return ['Liquid Soap', products]
@@ -374,9 +373,10 @@ def enter_products():
     """
     print('What product did you buy?')
     while True:
-        product = input('Enter product description:')
-        price = input('Enter the net value of the product:')
-        return [product, float(price)]
+        product = input('Enter product description:\n')
+        amount = input(f'Enter amount of {product}s bought:')
+        price = input('Enter the net value of the product:\n')
+        return [product, amount, float(price)]
 
 def how_many(var):
     """prompts for an amount of something
@@ -581,18 +581,16 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None, tran
         if ttype == 2:
             price = float(itm[2])
             grosses.append(price)
-            stock_itms.append([STOCK, product, [date, amount, price], True])
+            if extratype == 1:
+                stock_itms.append([GENERAL_LEDGER, 'Non-Current Assets',
+                                   [product, trans_id, price], False])
+            if extratype == 2:
+                stock_itms.append([GENERAL_LEDGER, 'Current Assets',
+                                   [product, trans_id, price], False])
+                stock_itms.append([STOCK, product, [date, amount, price], True])
     gross_total = float(sum(grosses))
-    if extratype == 1:
-        stock_itms.append([GENERAL_LEDGER, 'Non-Current Assets',
-                    ['Purchase', trans_id, gross_total], False])
-    if extratype == 2:
-        stock_itms.append([GENERAL_LEDGER, 'Current Assets',
-                    ['Inventory Replenishment', trans_id, gross_total], False])
     print(f"Gross total: {gross_total}")
     return [stock_itms, gross_total]
-
-
 
 
 def sort_cr_sale_data(details: list, date: str, customer: list):
@@ -614,8 +612,9 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     print(f"GetData Complete: {get_data}")
     data = [name, account_no, get_data[1], trans_id, inv_no, date]
     order = []
+    print(get_data[0])
     for itm in get_data[0]:
-        order.append([itm[1], itm[2][2], itm[2][3]])
+        order.append([itm[1], itm[2][1], itm[2][2]])
     print(order)
     write_cr_sale(data, get_data[0])
     sort_data(order, date, inv_no, trans_id, name, address)
@@ -638,11 +637,9 @@ def write_cr_sale(data, stock_list):
     gross_total = data[2]
     trans_id = data[3]
     inv_no = data[4]
-    date = data[5]
     data_ls = [
     [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total], True],
-    [RECEIVABLES, name, ['Invoice', inv_no, gross_total], True],
-    [ACCOUNTS, 'sdb', [date, account_no, gross_total * 0.75, gross_total * 0.25, gross_total], True]
+    [RECEIVABLES, name, ['Invoice', inv_no, gross_total], True]
     ]
     for itm in stock_list:
         data_ls.append(itm)
@@ -662,8 +659,7 @@ def write_dr_sale(details: list, date: str):
     data_ls = [
         [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75], True],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25], True],
-        [GENERAL_LEDGER, 'Current Assets', ['sales', trans_id, gross], False],
-        [ACCOUNTS, 'cash', [date, 'sales', trans_id, gross], True]
+        [GENERAL_LEDGER, 'Current Assets', ['sales', trans_id, gross], False]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -690,8 +686,7 @@ def write_cr_purchase(itms, data, acct):
     gross = float(get_data[1])
     data_ls = [
     [GENERAL_LEDGER, 'Trade Payables', [account_no, trans_id, gross], True],
-    [PAYABLES, name, ['Invoice', inv_no, gross], True],
-    [ACCOUNTS, 'pdb', [date, account_no, gross], True]
+    [PAYABLES, name, ['Invoice', inv_no, gross], True]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -714,8 +709,7 @@ def write_dr_purchase(itms, date, acct):
     gross = float(get_data[1])
     data_ls = [
     [GENERAL_LEDGER, 'Sales Tax', ['Cash Purchase', trans_id, gross], False],
-    [GENERAL_LEDGER, 'Cash', ['Cash Purchase', trans_id, gross], False],
-    [ACCOUNTS, 'cash', [date, trans_id, gross], True]
+    [GENERAL_LEDGER, 'Cash', ['Cash Purchase', trans_id, gross], False]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)

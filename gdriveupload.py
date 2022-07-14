@@ -64,7 +64,6 @@ def end(fileid= None):
     while True:
         choise = input('Select an option:')
         if choise in ('y', 'Y'):
-            start()
             break
         if choise in ('n', 'N'):
             print('Thank you for trying the app :)')
