@@ -579,7 +579,7 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     order = []
     for itm in get_data[0]:
         order.append([itm[1], itm[2][1], itm[2][2]])
-    #write_cr_sale(data, get_data[0])
+    write_cr_sale(data, get_data[0])
     sort_data(order, date, inv_no, trans_id, name, address)
 
 

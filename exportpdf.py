@@ -96,7 +96,7 @@ def generate_pdf(invoice_num, filename, vat_no, tbl_one, tbl_two, summary, sammo
     SimpleDocTemplate(filename, pagesize=A4,
                         rightMargin=12, leftMargin=12,
                         topMargin=12, bottomMargin=6).build(pdf_content)
-    #upload_to_folder(filename)
+    upload_to_folder(filename)
 
 def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     """
