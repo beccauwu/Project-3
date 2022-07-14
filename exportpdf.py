@@ -6,7 +6,6 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import ParagraphStyle
 from gdriveupload import upload_to_folder
 
-
 Creator = namedtuple("Creator", ["name", "email", "phone_num", "account", "vat_reg_no"])
 Customer = namedtuple("Customer", ["name", "address", "city", "postcode", "country"])
 File = namedtuple("File", ["filename", "font_size", "line_height"])

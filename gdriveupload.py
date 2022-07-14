@@ -5,8 +5,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 
-
-
 def upload_to_folder(filename):
     """
     from: https://developers.google.com/drive/api/guides/folder#create
@@ -51,9 +49,8 @@ def end(fileid):
         Defaults to None.
     """
     print('-----Links-----')
-    if fileid:
-        print("Open created invoice:")
-        print(f"https://drive.google.com/file/d/{fileid}/view?usp=sharing")
+    print("Open created invoice:")
+    print(f"https://drive.google.com/file/d/{fileid}/view?usp=sharing")
     print('Open invoices folder:')
     print('https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing')
     print('Open spreadsheets folder:')
