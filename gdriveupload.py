@@ -37,19 +37,17 @@ def upload_to_folder(filename):
                                       fields='id').execute()
         fileid = file.get('id')
         print('Operation completed.\n')
-        print(F'File: "{fileid}" has been added to folder: "{folder_id}".\n')
     except HttpError as error:
         print(F'An error occurred: {error}')
         file = None
+    end(fileid)
 
-    return file.get('id')
 
-
-def end(fileid= None):
-    """last function to be called. has an option to go to start menu or end
+def end(fileid):
+    """lists links to different folders/files
 
     Args:
-        fileid (str, optional): id for a created invoice if an invoice was created. 
+        fileid (str): id for a created invoice if an invoice was created. 
         Defaults to None.
     """
     print('-----Links-----')
@@ -60,13 +58,3 @@ def end(fileid= None):
     print('https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing')
     print('Open spreadsheets folder:')
     print('https://drive.google.com/drive/folders/1pOgtupYWIjwE0W5tDjbob2cMwOyht9K6?usp=sharing\n')
-    print('Would you like to go back to start menu? (y/n)')
-    while True:
-        choise = input('Select an option:')
-        if choise in ('y', 'Y'):
-            break
-        if choise in ('n', 'N'):
-            print('Thank you for trying the app :)')
-            break
-        print('Value entered is not valid.')
-        print('Please try again.')

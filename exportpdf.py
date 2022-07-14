@@ -104,7 +104,6 @@ def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     items = []
     creator = Creator('Test User', 'test@gmail.com', '098912312','DE1921 3210 9381 8211', 'SE00000000001')
     customer = Customer(name, address[0], address[1], address[2], address[3])
-    print(f"customer: {customer}")
     file = File(f"{inv_num}.pdf", 12, 5)
     print("""
           ---Customer Type---
@@ -194,12 +193,10 @@ def vat_excempt():
         boolean: true if is, false if not
     """
     while True:
-        choise = input("Is the customer VAT excempt? (y/n)")
+        choise = input("Is the customer VAT excempt? (y/n)\n")
         if choise in ('y', 'Y'):
-            print('Customer is VAT excempt.')
             return True
         if choise in ('n', 'N'):
-            print('Customer is not VAT excempt.')
             return False
         print('Invalid choise, please try again')
 

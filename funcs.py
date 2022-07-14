@@ -39,23 +39,15 @@ def product_menu():
         choise = input("Choose an option: \n")
         if choise == '1':
             products = how_many(input("How many soap bars?\n"))
-            print(f"Got it. {products} bars of soap")
-            print("\033c")
             return ['Soap Bar', products]
         if choise == '2':
             products = how_many(input("How many bottles\n"))
-            print(f"Got it. {products} bottles of soap")
-            print("\033c")
             return ['Liquid Soap', products]
         if choise == '3':
             products = how_many(input("How many jars?\n"))
-            print(f"Got it. {products} jars of coconut oil")
-            print("\033c")
             return ['Coconut Oil', products]
         if choise == '4':
             products = how_many(input("How many cans?\n"))
-            print(f"Got it. {products} cans of lute")
-            print("\033c")
             return ['NaOH', products]
         print("Not a valid input please enter a number 1-4")
 
@@ -76,27 +68,19 @@ def product_menu_purchase():
         choise = input("Choose an option: \n")
         if choise == '1':
             products = how_many(input("How many soap bars?\n"))
-            print(f"Got it. {products} bars of soap")
             price = input('Enter the total price for the product:\n')
-            print("\033c")
             return ['Soap Bar', products, price]
         if choise == '2':
-            products = how_many(input("How many bottles"))
-            print(f"Got it. {products} bottles of soap")
+            products = how_many(input("How many bottles\n"))
             price = input('Enter the total price for the product:\n')
-            print("\033c")
             return ['Liquid Soap', products, price]
         if choise == '3':
             products = how_many(input("How many jars?\n"))
-            print(f"Got it. {products} jars of coconut oil")
             price = input('Enter the total price for the product:\n')
-            print("\033c")
             return ['Coconut Oil', products, price]
         if choise == '4':
             products = how_many(input("How many cans?\n"))
-            print(f"Got it. {products} cans of lute")
             price = input('Enter the total price for the product:\n')
-            print("\033c")
             return ['NaOH', products, price]
         print("Not a valid input please enter a number 1-4")
 
@@ -104,22 +88,20 @@ def sales_receipts_menu(customer, account):
     """
     Enters records of sales receipts into relevant accounts
     """
-    print('First choose customer who made the payment\n')
-    inv_nos = RECEIVABLES.worksheet(customer).col_values(3)[1:]
+    print('Choose customer who made the payment\n')
+    inv_nos = RECEIVABLES.worksheet(customer).col_values(2)[3:]
     print(inv_nos)
     trans_id = get_trans_id('SR')
-    print(trans_id)
     invoice = None
     while True:
-        invoice = input('Enter invoice number for payment:')
+        invoice = input('Enter invoice number for payment:\n')
         try:
-            amount = float(input('Enter amount received:'))
+            amount = float(input('Enter amount received:\n'))
         except TypeError as typ_err:
             print(f'Value entered {typ_err} is not valid.')
             print('Please try again.')
         else:
             data = [customer, account, trans_id, amount, invoice]
-            print(data)
             return data
 
 def purchase_payments_menu(supplier, account):
@@ -129,18 +111,16 @@ def purchase_payments_menu(supplier, account):
     inv_nos = PAYABLES.worksheet(supplier).col_values(2)[3:]
     print(inv_nos)
     trans_id = get_trans_id('PP')
-    print(trans_id)
     invoice = None
     while True:
-        invoice = input('Enter invoice number for payment:')
+        invoice = input('Enter invoice number for payment:\n')
         if is_item_in_list(inv_nos, invoice):
             try:
-                amount = float(input('Enter amount paid:'))
+                amount = float(input('Enter amount paid:\n'))
             except TypeError as typ_err:
                 print(f'Value entered {typ_err} is not valid.')
                 print('Please try again.')
             data = [supplier, account, trans_id, amount, invoice]
-            print(data)
             return data
         raise ValueError(f'Invoice number {invoice} is not valid.')
 
@@ -157,14 +137,14 @@ def register_sales_receipt(data):
     amount = data[3]
     inv_no = data[4]
     data_ls = [
-        [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, amount]], False,
+        [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, amount], True],
         [GENERAL_LEDGER, 'Cash', ['GL300', trans_id, amount * 0.75], True],
         [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25], True],
-        [RECEIVABLES, customer, ['Payment', -abs(amount), inv_no], False]
+        [RECEIVABLES, customer, ['Payment', amount, inv_no], False]
     ]
     append_data(data_ls)
     print(f"Outstanding balance on {customer}'s account:")
-    print(RECEIVABLES.worksheet(customer).acell('H4').value())
+    print(RECEIVABLES.worksheet(customer).acell('H3').value())
 
 def register_purchase_payment(data):
     """passes purchase payment data to append_data
@@ -182,11 +162,11 @@ def register_purchase_payment(data):
         [GENERAL_LEDGER, 'Trade Payables', [account_no, trans_id, amount], False],
         [GENERAL_LEDGER, 'Cash', ['GL400', trans_id, amount * 0.75], True],
         [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25], True],
-        [PAYABLES, supplier, ['Payment', amount, inv_no], False]
+        [PAYABLES, supplier, ['Payment', inv_no, amount], False]
     ]
     append_data(data_ls)
     print(f"Outstanding balance on {supplier}'s account:")
-    print(PAYABLES.worksheet(supplier).acell('H4').value())
+    print(PAYABLES.worksheet(supplier).acell('H3').value())
 
 def purchases_menu():
     """creates list of items purchased
@@ -223,7 +203,6 @@ def choose_customer():
     """
     existing_customers = get_worksheet_titles(RECEIVABLES)[1:]
     last_account_no = RECEIVABLES.worksheet(existing_customers[- 1]).acell('A1').value
-    print(f"last account number: {last_account_no}")
     num = 1
     for customer in existing_customers:
         print(num, '', customer)
@@ -234,7 +213,7 @@ def choose_customer():
             name = input('Customer name:\n')
             new = new_account_number(last_account_no)
             new_worksheet(RECEIVABLES, '1255198903', name, new)
-            print("Now let's add the customer address.\n")
+            print("Now let's add the customer address")
             street = input('Street name and house number:\n')
             city = input('City:\n')
             postcode = input('Postcode:\n')
@@ -253,8 +232,6 @@ def choose_customer():
             account_no = RECEIVABLES.worksheet(customer).acell('A1').value
             address_row = DATABASE.worksheet('addresses').find(customer).row
             address = DATABASE.worksheet('addresses').row_values(address_row)
-            print(address)
-            print(f"{customer} chosen. Proceeding.")
             return [account_no, address]
 
 
@@ -287,7 +264,6 @@ def choose_supplier():
         else:
             supplier = existing_suppliers[int(choise) - 1]
             account_no = PAYABLES.worksheet(supplier).acell('A1').value
-            print(f"{supplier} chosen. Proceeding.")
             return [supplier, account_no]
 
 
@@ -321,7 +297,6 @@ def how_many_items():
         while int_choise > 0:
             items.append(product_menu())
             int_choise -= 1
-        print(items)
         return items
 
 def how_many_items_purchase():
@@ -338,7 +313,6 @@ def how_many_items_purchase():
         while int_choise > 0:
             items.append(product_menu_purchase())
             int_choise -= 1
-        print(items)
         return items
 
 def no_of_products():
@@ -353,12 +327,11 @@ def no_of_products():
     items = []
     print('Did you buy several products?')
     while True:
-        choise = how_many(input('Type the amount of different products you bought:'))
+        choise = how_many(input('Type the amount of different products you bought:\n'))
         int_choise = int(choise)
         while int_choise > 0:
             items.append(enter_products())
             int_choise -= 1
-        print(items)
         return items
 
 def enter_products():
@@ -371,10 +344,10 @@ def enter_products():
     Returns:
         _type_: _description_
     """
-    print('What product did you buy?')
+    print('What product did you buy?\n')
     while True:
         product = input('Enter product description:\n')
-        amount = input(f'Enter amount of {product}s bought:')
+        amount = input(f'Enter amount of {product}s bought:\n')
         price = input('Enter the net value of the product:\n')
         return [product, amount, float(price)]
 
@@ -404,10 +377,8 @@ def cash_or_credit(trans_type: str):
     while True:
         choise = input(f"Choose type of {trans_type.lower()}: \n")
         if choise == '1':
-            print(f'Chose credit {trans_type.lower()} \n')
             return 1
         if choise == '2':
-            print(f'Chose cash {trans_type.lower()}')
             return 2
         print("Not a valid input please enter a number 1-3")
 
@@ -493,7 +464,6 @@ def get_gross_total(product: str, amount: int):
     Returns:
         _type_: _description_
     """
-    print('Calculating the gross total of your sale...')
     product_prices = {
         'Soap Bar': 6,
         'Liquid Soap': 5,
@@ -519,7 +489,6 @@ def get_trans_id(ttype: str):
         trans_id = f"{ttype}{str(gen_rand_list(7))}"
         if not is_item_in_list(old_trans_ids, trans_id):
             index_of.append_row([trans_id])
-        print(trans_id)
         return trans_id
 
 def get_inv_id():
@@ -583,13 +552,12 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None, tran
             grosses.append(price)
             if extratype == 1:
                 stock_itms.append([GENERAL_LEDGER, 'Non-Current Assets',
-                                   [product, trans_id, price], False])
+                                   [product, trans_id, price], True])
             if extratype == 2:
                 stock_itms.append([GENERAL_LEDGER, 'Current Assets',
-                                   [product, trans_id, price], False])
+                                   [product, trans_id, price], True])
                 stock_itms.append([STOCK, product, [date, amount, price], True])
     gross_total = float(sum(grosses))
-    print(f"Gross total: {gross_total}")
     return [stock_itms, gross_total]
 
 
@@ -606,16 +574,11 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     address = customer[1][1:5]
     trans_id = get_trans_id('SC')
     inv_no = get_inv_id()
-    print(f"Transaction ID: {trans_id}")
-    print(f"Invoice number: {inv_no}")
     get_data = make_item_list(date, details, 1)
-    print(f"GetData Complete: {get_data}")
     data = [name, account_no, get_data[1], trans_id, inv_no, date]
     order = []
-    print(get_data[0])
     for itm in get_data[0]:
         order.append([itm[1], itm[2][1], itm[2][2]])
-    print(order)
     write_cr_sale(data, get_data[0])
     sort_data(order, date, inv_no, trans_id, name, address)
 
@@ -631,15 +594,15 @@ def write_cr_sale(data, stock_list):
         date (str): transaction date
         customer (list): [customer name, account number]
     """
-    print('Writing transaction data...')
     name = data[0]
     account_no = data[1]
     gross_total = data[2]
     trans_id = data[3]
     inv_no = data[4]
     data_ls = [
-    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total], True],
-    [RECEIVABLES, name, ['Invoice', inv_no, gross_total], True]
+    [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, gross_total], False],
+    [RECEIVABLES, name, ['Invoice', inv_no, gross_total], True],
+    [GENERAL_LEDGER, 'Current Assets', ['Credit sales', trans_id, gross_total], False]
     ]
     for itm in stock_list:
         data_ls.append(itm)
@@ -652,14 +615,13 @@ def write_dr_sale(details: list, date: str):
         details (list): product name, amount
         date (str): transaction date
     """
-    print('Writing transaction data...')
     trans_id = get_trans_id('SD')
     get_data = make_item_list(date, details, 1)
     gross = get_data[1]
     data_ls = [
-        [GENERAL_LEDGER, 'Sales', ['cash sale', trans_id, gross * 0.75], True],
+        [GENERAL_LEDGER, 'Cash', ['cash sale', trans_id, gross * 0.75], True],
         [GENERAL_LEDGER, 'Sales Tax', ['cash sale', trans_id, gross * 0.25], True],
-        [GENERAL_LEDGER, 'Current Assets', ['sales', trans_id, gross], False]
+        [GENERAL_LEDGER, 'Current Assets', ['Cash sales', trans_id, gross], False]
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
@@ -673,7 +635,6 @@ def write_cr_purchase(itms, data, acct):
         date (str): transaction date
         supplier (list): [supplier name, account number]
     """
-    print('Writing transaction data...')
     account_no = data[2]
     name = data[1]
     inv_no = data[3]
@@ -690,7 +651,6 @@ def write_cr_purchase(itms, data, acct):
     ]
     for itm in get_data[0]:
         data_ls.append(itm)
-    print(data_ls)
     append_data(data_ls)
 
 def write_dr_purchase(itms, date, acct):
@@ -700,7 +660,6 @@ def write_dr_purchase(itms, date, acct):
         details (list): product name, amount
         date (str): transaction date
     """
-    print('Writing transaction data...')
     trans_id = get_trans_id('PD')
     if acct == 'Non-Current Assets':
         get_data = make_item_list(date, itms, 2, 1, trans_id)
@@ -708,7 +667,6 @@ def write_dr_purchase(itms, date, acct):
         get_data = make_item_list(date, itms, 2, 2, trans_id)
     gross = float(get_data[1])
     data_ls = [
-    [GENERAL_LEDGER, 'Sales Tax', ['Cash Purchase', trans_id, gross], False],
     [GENERAL_LEDGER, 'Cash', ['Cash Purchase', trans_id, gross], False]
     ]
     for itm in get_data[0]:
@@ -795,7 +753,6 @@ def append_data(data_list):
                 - True if data is added to left side in accounts (Dr)
                 - False if added to right (Cr)
     """
-    print('Reading data...\n')
     with ChargingBar('Writing data|', max=len(data_list)) as progress_bar:
         for data in data_list:
             spreadsheet = data[0]
@@ -844,7 +801,7 @@ def product_stock_amount():
     worksheets = get_worksheet_titles(STOCK)[1:]
     for worksheet in worksheets:
         wsh = STOCK.worksheet(worksheet)
-        stock_amount = wsh.acell('J3').value
+        stock_amount = wsh.acell('H3').value
         print(f'{worksheet}: {stock_amount} in stock')
 
 def current_profit_margin():
@@ -856,17 +813,17 @@ def current_profit_margin():
     sold_vals = []
     for worksheet in worksheets:
         wsh = STOCK.worksheet(worksheet)
-        bought_val = float(wsh.acell('K3').value)
-        sold_val = float(wsh.acell('L3').value)
+        bought_val = float(wsh.acell('I3').value)
+        sold_val = float(wsh.acell('J3').value)
         bought_vals.append(bought_val)
         sold_vals.append(sold_val)
-        product_profit_margin = round(float(sold_val / bought_val * 100), 2)
+        product_profit_margin = round(float((sold_val-bought_val) / bought_val * 100), 2)
         print(f'Value of sold {worksheet}s: {sold_val}')
         print(f'Value of bought {worksheet}s: {bought_val}')
         print(f'{worksheet} profit margin: {product_profit_margin}%\n')
     total_bought = sum(bought_vals)
     total_sold = sum(sold_vals)
-    profit_margin = round(float(total_sold / total_bought * 100), 2)
+    profit_margin = round(float((total_sold-total_bought) / total_bought * 100), 2)
     print(f'Total value of sold products: {total_sold}')
     print(f'Total value of bought products: {total_bought}')
     print(f'Total profit margin: {profit_margin}%\n')
