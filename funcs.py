@@ -144,7 +144,7 @@ def register_sales_receipt(data):
     ]
     append_data(data_ls)
     print(f"Outstanding balance on {customer}'s account:")
-    print(RECEIVABLES.worksheet(customer).acell('H3').value())
+    print(RECEIVABLES.worksheet(customer).acell('H3').value)
 
 def register_purchase_payment(data):
     """passes purchase payment data to append_data
@@ -166,7 +166,7 @@ def register_purchase_payment(data):
     ]
     append_data(data_ls)
     print(f"Outstanding balance on {supplier}'s account:")
-    print(PAYABLES.worksheet(supplier).acell('H3').value())
+    print(PAYABLES.worksheet(supplier).acell('H3').value)
 
 def purchases_menu():
     """creates list of items purchased
