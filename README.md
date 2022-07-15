@@ -149,6 +149,7 @@ Below I have detailed what postings happen as a consequence of each type of tran
 | **Payables** 	| None 	| None 	| Supplier Account (Dr) 	| None 	| None 	| Supplier Account (Cr) 	|
 | **Receivables** 	| Customer account (Cr) 	| None 	| None 	| None 	| Customer account (Dr) 	| None 	|
 | **Stock** 	| Sold item(s) account (Cr) 	| Sold item(s) account (Cr) 	| If current asset:<br>bought item(s) account (Dr) 	| If current asset:<br>bought item(s) account (Dr) 	| None 	| None 	|
+| **Database** 	| Invoice NO,<br>Transaction ID 	| Transaction ID 	| Transaction ID 	| Transaction ID 	| Transaction ID 	| Transaction ID 	|
 
 <h1 id="dependencies">3. Dependencies</h1>
 
