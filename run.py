@@ -1,18 +1,18 @@
 import time
-import funcs
+from modules import funcs
 
 def start():
     """
     Start menu where the user can choose between 4 different tasks.
     """
     print("""
-                --------MENU--------
+                --------MENU--------\n\
                 1. Account for sales\n\
                 2. Account for purchases\n\
                 3. Account for sales receipts\n\
                 4. Account for purchase payments\n\
                 5. View current inventory status\n\
-                6. Show profit margins
+                6. Show profit margins\n
                     """)
     while True:
         choise = input("Choose an option: \n")
@@ -62,8 +62,6 @@ def sale():
         funcs.write_dr_sale(details, date)
         start_over()
 
-
-
 def purchase():
     """
     Menu for accounting purchases
@@ -100,7 +98,6 @@ def purchase_payments():
     funcs.register_purchase_payment(data)
     start_over()
 
-
 def start_over():
     """Asks user if they want to go back to start menu
     """
@@ -120,7 +117,7 @@ def first():
     Prints out project logo as text one line at a time, then proceeds to start
     """
     lines = [
-        '               :        .',
+        '\n               :        .',
         '               :       / \  /\  .',
         '               :      /   \/  \/ \  .——>',
         '               :     /          __\/',

@@ -49,7 +49,7 @@ def end(fileid):
         Defaults to None.
     """
     print('-----Links-----')
-    print("Open created invoice:")
+    print('Open created invoice:')
     print(f"https://drive.google.com/file/d/{fileid}/view?usp=sharing")
     print('Open invoices folder:')
     print('https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing')

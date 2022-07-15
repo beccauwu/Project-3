@@ -2,7 +2,7 @@ from random import randint
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
-from exportpdf import sort_data
+from modules.exportpdf import sort_data
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -160,8 +160,7 @@ def register_purchase_payment(data):
     inv_no = data[4]
     data_ls = [
         [GENERAL_LEDGER, 'Trade Payables', [account_no, trans_id, amount], False],
-        [GENERAL_LEDGER, 'Cash', ['GL400', trans_id, amount * 0.75], True],
-        [GENERAL_LEDGER, 'Sales Tax', ['GL300', trans_id, amount * 0.25], True],
+        [GENERAL_LEDGER, 'Cash', ['GL400', trans_id, amount], True],
         [PAYABLES, supplier, ['Payment', inv_no, amount], False]
     ]
     append_data(data_ls)
@@ -265,9 +264,6 @@ def choose_supplier():
             supplier = existing_suppliers[int(choise) - 1]
             account_no = PAYABLES.worksheet(supplier).acell('A1').value
             return [supplier, account_no]
-
-
-
 
 def gen_rand_list(num):
     """generates a list with random digits
@@ -559,7 +555,6 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None, tran
                 stock_itms.append([STOCK, product, [date, amount, price], True])
     gross_total = float(sum(grosses))
     return [stock_itms, gross_total]
-
 
 def sort_cr_sale_data(details: list, date: str, customer: list):
     """passes transaction data to append_data

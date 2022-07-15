@@ -106,25 +106,49 @@ When recording purchase transactions, the process is largely similar to sales tr
 
 <h3 id="colours-and-fonts"> 2.4. Recording Purchase transactions</h3>
 
-<h3 id="pages">2.5. Dependencies</h3>
 
-* Collections
+
+<h3 id="colours-and-fonts"> 2.5. Database Structure</h3>
+
+Each worksheet in a spreadsheet have the same structure. There are some differences between spreadsheets but the structure is roughly the same.
+Columns 1-3 are the debit side with 3 keys and columns 4-6 are the credit side with 3 keys. The keys can vary between spreadsheets.
+
+|                 	|           	| **Dr**        	|         	|           	| **Cr**      	|         	|
+|-----------------	|-----------	|---------------	|---------	|-----------	|-------------	|---------	|
+| **Spreadsheet** 	| **Key**   	| **Key**       	| **Key** 	| **Key**   	| **Key**     	| **Key** 	|
+| Stock           	| Date      	| Amount Bought 	| Total   	| Date      	| Amount Sold 	| Total   	|
+| Payables        	| Narrative 	| Invoice NO    	| €       	| Narrative 	| Invoice NO  	| €       	|
+| Receivables     	| Narrative 	| Invoice NO    	| €       	| Narrative 	| Invoice NO  	| €       	|
+| General Ledger  	| Narrative 	| Ref           	| €       	| Narrative 	| Ref         	| €       	|
+
+Below I have detailed what postings happen as a consequence of each type of transaction. Horizontally are the transaction types and vertically the spreadsheets. The data in their cross section represents worksheets in the spreadsheets and whether the transaction is recorded on the debit or credit side in each of them.
+
+| Transaction/ Spreadsheet 	|              **Sales, Credit**              	|                 **Sales, Cash**                	|                 **Purchases, Credit**                	|             **Purchases, Cash**            	|                 **Sales Receipt**                 	|      **Purchase Payment**      	|
+|:------------------------:	|:-------------------------------------------:	|:----------------------------------------------:	|:----------------------------------------------------:	|:------------------------------------------:	|:-------------------------------------------------:	|:------------------------------:	|
+|    **General Ledger**    	| Trade Receivables (Dr), Current Assets (Cr) 	| Cash (Dr), Sales Tax (Dr), Current Assets (Cr) 	| Trade Payables (Cr), Current/Non-current Assets (Dr) 	| Cash (Cr), Current/Non-current Assets (Dr) 	| Trade Receivables (Cr), Cash (Dr), Sales Tax (Dr) 	| Trade Payables (Dr), Cash (Cr) 	|
+|       **Payables**       	|                     None                    	|                      None                      	|                 Supplier Account (Dr)                	|                    None                    	|                        None                       	|      Supplier Account (Cr)     	|
+|      **Receivables**     	|            Customer account (Cr)            	|                      None                      	|                         None                         	|                    None                    	|               Customer account (Dr)               	|              None              	|
+|         **Stock**        	|          Sold item(s) account (Cr)          	|                                                	|     If current asset: bought item(s) account (Dr)    	|                                            	|                        None                       	|              None              	|
+
+<h3 id="pages">2.6. Dependencies</h3>
+
+* [Collections](https://docs.python.org/3/library/collections.html#module-collections)
 
     Namedtuple from Collections is used for data management when creating an invoice.
 
-* Google Drive API
+* [Google Drive API](https://developers.google.com/drive/api)
 
     Google Drive API is used to upload files to Google Drive.
 
-* GSpread
+* [GSpread](https://github.com/burnash/gspread)
 
     Gspread is used to update worksheets with data and creating worksheets.
 
-* Progress
+* [Progress](https://pypi.org/project/progress/)
 
     ChargingBar from Progress is used to provide feedback on the sometimes slow updates to worksheets.
 
-* Reportlab
+* [Reportlab](https://www.reportlab.com/)
 
     Reportlab is used for generating invoices as PDF files.
 
@@ -135,6 +159,7 @@ When recording purchase transactions, the process is largely similar to sales tr
 
 All the app functionality has been tested thoroughly and the code has been passed through pylint without issues.
 
+validation and functionality
 
 <h2 id="bugs">4. Bugs</h2>
 
