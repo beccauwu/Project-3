@@ -275,7 +275,7 @@ Fix 💚: Convert the string to uppercase before adding it to the invoice
 
 I deployed the page on Heroku via the following procedure:
 
-1. Sign up or log in to heroku.com
+1. Sign up or log in to heroku and open the [heroku dashboard](https://dashboard.heroku.com/)
 2. Select 'Create New App'
 3. Name the project (must be a unique name), choose your region and click 'Create'
 4. Navigate to the settings tab (must be done before deploying code)
