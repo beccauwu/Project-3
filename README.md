@@ -226,35 +226,77 @@ Verdict ✅: I cannot give the test a verdict at this point, however if a value 
 
 ---------------
 
+**Pylint**
 
+I have pylint installed on VSCode so I have been able to sort out problems as they come. There are still some flags which I am aware of but they are not anything that impact the functionality of the app nor are they many times possible to solve:
+
+* run.py 
+  * **anomalous backslashes:**
+    This error is due to the project logo print out at the start using backslashes to draw the logo. It is the best way to do it and I like having the logo there as a buffer when starting the app.
+* exportpdf.py
+  * **variable name doesn't conform to snake_case naming style:**
+    The reason for the variables to be named that is to avoid confusion and in the case of variables 't' and 't2', the preferred names 'tbl' and 'tbl_two' are already used as parameters in the function which makes it impossible to rename them. Any other names would not be as clear as these are.
+
+![Screenshot of function with invalid name error][invalid-name]
 
 <h2 id="bugs">4. Bugs</h2>
 
 **Fixed**
 
+---------------
+
 Bug: App appended a line in the spreadsheet it was writing to instead of writing on the same line as the existing text was on.
 
-Fix: Modify function that adds to sheet, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replaces the original values.
+Cause: The append_data function used the worksheet.append_row funtion instead of updating the sheet with new data.
+
+![screenshot of the old version of append_data][old-appd]
+
+Fix: Modify append_data, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replaces the original values.
+
+![screenshot of the new version of append_data][new-appd]
+
+---------------
 
 Bug: When generating a transaction ID the app got stuck in a loop
 
+Cause: Return statement was indented too much
+
 Fix: Change indentation of the return statement inside function
 
-**Persistent**
+![gif of the fix][transaction-id]
 
-Bug: 
+---------------
+
+Bug: When creating an invoice, the country of the customer was not printed
+
+Cause: The formatting of the paragraph string made it not work
+
+Fix: Convert the string to uppercase before adding it to the invoice
+
+---------------
 
 
-<h2 id="deployment">5. Deployment</h2>
+<h1 id="deployment">5. Deployment</h1>
 
 I deployed the page on Heroku via the following procedure:
 
-1. From the project's repository, go to the Settings tab.
-2. From the left-hand menu, select the Pages tab.
-3. Under the Source section, select the Main branch from the drop-down menu and click Save.
-4. A message will be displayed to indicate a successful deployment to GitHub pages and provide the live link.
+1. Sign up or log in to heroku.com
+2. Select 'Create New App'
+3. Name the project (must be a unique name), choose your region and click 'Create'
+4. Navigate to the settings tab (must be done before deploying code)
+5. Add 'Config vars'
+6. As key enter 'CREDS'
+7. As value paste the contents of your credentials file
+8. As key enter 'PORT'
+9.  As value enter '8000'
+10. Click 'Add Buildpack'
+11. Add Python and NodeJS as buidpacks
+12. Navigate to the Deploy tab
+13. Select GitHub as deployment method and confirm that you want to connect to your repository
+14. Enter the name of the repository and click 'connect'
+15. Once complete, select 'Automatic Deploys'. As your deployment method. This will create a deployed link which displays a mock terminal.
 
-You can find the live site via the following URL - [Snake live webpage](https://beccauwu.github.io/accountspy-preview)
+You can find the live site via the following URL - [accountspy-preview live webpage](https://rugged-kings-canyon-79210.herokuapp.com/)
 
 <h2 id="future-enhancements">6. Future Enhancements</h2>
 
@@ -270,18 +312,10 @@ On top of these it would be fully possible to add the possibilities for integrat
 * Sending invoices to customers
 * Overdue invoices follow-ups
 
-
-<!-- CONTACT -->
-<h1 id="contact">7. Contact</h1>
-
-Rebecca Perttula - [@uwuphoto](https://twitter.com/uwuphoto) - rebecca@perttula.co
-
-Project Link: [https://beccauwu.github.io/accountspy-preview](https://beccauwu.github.io/accountspy-preview)
-
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- Credits -->
-<h1 id="credits">8. Credits</h1>
+<h1 id="credits">7. Credits</h1>
 
 * **Richard Wells**
   
@@ -289,7 +323,7 @@ Project Link: [https://beccauwu.github.io/accountspy-preview](https://beccauwu.g
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<h1 id="links">9. Links</h1>
+<h1 id="links">8. Links</h1>
 
 * [Database Google Drive folder](https://drive.google.com/drive/folders/1pOgtupYWIjwE0W5tDjbob2cMwOyht9K6?usp=sharing)
 * [Invoices Google Drive Folder](https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing)
@@ -312,3 +346,7 @@ Project Link: [https://beccauwu.github.io/accountspy-preview](https://beccauwu.g
 [product-screenshot]: assets/images/amiresponsive.png
 <!-- Site Captures -->
 [start]: assets/img/banner.png
+[invalid-name]: assets/img/invalid-name.png
+[old-appd]: assets/img/old-appd.png
+[new-appd]: assets/img/new-appd.png
+[transaction-id]: assets/img/transaction-id.gif

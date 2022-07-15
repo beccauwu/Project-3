@@ -1,3 +1,5 @@
+"""Main file for app, calls funcs for the logic
+"""
 import time
 from modules import funcs
 

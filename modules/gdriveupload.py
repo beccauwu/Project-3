@@ -1,3 +1,6 @@
+"""Uploads generated invoice to the Invoices folder on GoogleDrive
+"""
+
 from __future__ import print_function
 
 import google.auth
@@ -45,7 +48,7 @@ def end(fileid):
     """lists links to different folders/files
 
     Args:
-        fileid (str): id for a created invoice if an invoice was created. 
+        fileid (str): id for a created invoice if an invoice was created.
         Defaults to None.
     """
     print('-----Links-----')

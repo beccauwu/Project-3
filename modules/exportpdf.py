@@ -1,3 +1,6 @@
+"""Creates a pdf file with data fed to it, passes invoice to gdriveupload to upload to Drive
+"""
+
 from collections import namedtuple
 from progress.bar import ChargingBar
 from reportlab.lib import colors
@@ -110,7 +113,8 @@ def sort_data(orders:list, date, inv_num, ref_num, name, address: list):
     them then onto create_content
     """
     items = []
-    creator = Creator('Test User', 'test@gmail.com', '098912312','FI01 0000 0000 0000 0000', 'SE00000000001')
+    creator = Creator('Test User', 'test@gmail.com',
+                      '098912312','FI01 0000 0000 0000 0000', 'SE00000000001')
     customer = Customer(name, address[0], address[1], address[2], address[3].upper())
     file = File(f"{inv_num}.pdf", 12, 5)
     for order in orders:
@@ -187,11 +191,11 @@ def create_content(pdf_invoice_obj, itms:list):
         Row1('', '', '', '')
     ]
     tbl2 = [
-        Row2(Paragraph("Item", price_bold), 
-            Paragraph("QTY", price_bold), 
+        Row2(Paragraph("Item", price_bold),
+            Paragraph("QTY", price_bold),
             Paragraph("à (€)", price_bold),
             Paragraph("VAT 25% (€)", price_bold),
-            Paragraph("Net (€)", price_bold), 
+            Paragraph("Net (€)", price_bold),
             Paragraph("Gross (€)", price_bold)),
     ]
     for itm in itms:
@@ -202,11 +206,11 @@ def create_content(pdf_invoice_obj, itms:list):
         grosses.append(float(itm.gross_total))
         tbl2.append(
             Row2(
-            Paragraph(f"{itm.itm}", price_normal), 
+            Paragraph(f"{itm.itm}", price_normal),
             Paragraph(f"{itm.amount}", price_normal),
             Paragraph(f"{itm.net_per_one}", price_normal),
             Paragraph(f"{itm.vat}", price_normal),
-            Paragraph(f"{itm.net_total}", price_normal), 
+            Paragraph(f"{itm.net_total}", price_normal),
             Paragraph(f"{itm.gross_total}", price_normal)
             )
         )
@@ -240,7 +244,8 @@ def set_table_styles(tbl, tbl_two, rowheights):
         tuple: styled tables
     """
     t = Table(tbl, colWidths=[110, 100, 150, 170], rowHeights=[40, 15, 15, 15, 40], vAlign='LEFT')
-    t2 = Table(tbl_two, colWidths=[130, 70, 70, 70, 70, 70], rowHeights=rowheights[0], vAlign='LEFT')
+    t2 = Table(tbl_two, colWidths=[130, 70, 70, 70, 70, 70],
+               rowHeights=rowheights[0], vAlign='LEFT')
     t2.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.25, colors.black),
                            ("INNERGRID", (0, 0), (-1, -1), 0.25, colors.black)]))
     data_len = len(tbl_two)
