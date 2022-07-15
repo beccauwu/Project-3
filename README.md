@@ -277,7 +277,7 @@ Fix 💚: Convert the string to uppercase before adding it to the invoice
 
 I deployed the page on Heroku via the following procedure:
 
-1. Sign up or log in to heroku and open [heroku dashboard](https://dashboard.heroku.com/)
+1. Sign up or log in to [heroku dashboard](https://dashboard.heroku.com/)
 2. Select 'Create New App'
 3. Name the project (must be a unique name), choose your region and click 'Create'
 4. Navigate to the settings tab (must be done before deploying code)
@@ -304,10 +304,10 @@ I will be working on the full version of the app in the future, where all functi
 * Excel support
 * Configurable accounts
 
-On top of these it would be fully possible to add the possibilities for integration with Electronic Fund Transfer at Point Of Sale (EFTPOS) systems, as well as add automated emails for a variety of functions including:
+On top of these it would be fully possible to add integrations for Electronic Fund Transfer at Point Of Sale (EFTPOS) systems, and automated emails for a variety of functions including:
 
 * Sending invoices to customers
-* Overdue invoices follow-ups
+* Overdue invoice follow-ups
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -340,7 +340,6 @@ On top of these it would be fully possible to add the possibilities for integrat
 [issues-url]: https://github.com/beccauwu/my-site/issues
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/rebeccaperttula
-[product-screenshot]: assets/images/amiresponsive.png
 <!-- Site Captures -->
 [start]: assets/img/banner.png
 [invalid-name]: assets/img/invalid-name.png
