@@ -1,4 +1,4 @@
-<body id="readme">
+<div id="readme">
 <div id="top"></div>
 <div align="center">
 
@@ -75,40 +75,57 @@
 
 
 <!-- Introduction -->
-<h2 id="introduction">1. Introduction</h2>
+<h1 id="introduction">1. Introduction</h2>
 
-[![Product Name Screen Shot][product-screenshot]](https://beccauwu.github.io/accountspy-preview)
+[![start menu screenshot][start]](https://beccauwu.github.io/accountspy-preview)
 
-Accountspy Preview is a demo app for a fully functioning and configurable accounting app I will make in the future.
+Before I started learning development I studied accountancy on my own time. I still love every aspect of it and writing code for software is really fun too. So I thought I would combine these two into an accounting software writen in Python. This is only somewhat of a demo-app - I realised when writing this that I would really like to try making something bigger out of the concept.
+Accounting software is notoriously expensive, often leaving small and medium sized businesses unable or struggling to afford the software they need to be able to comply with different kinds of regulations. 
+
+Having this in mind, I dreamt up the idea of an open source accounting software - fully configurable and relatively easy to use. Accountspy-preview showcases some of the features such an app would have with some of the most useful features in an accounting software. The features are largely centered around bookkeeping but there are also a couple of statistical tools which are the most useful for a business to know on the press of a button.
 
 **Features:**
 * Post sales/purchases data into relevant general ledger accounts/control accounts
 * Register receipts/payments for credit transactions
 * Show current stock balance for products sold
-* Calculate profit margins for products as well as total
+* Calculate profit margins for products as well as in total
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- Styling -->
-<h2 id="styling">2. Features</h2>
+<h1 id="features">2. Features</h1>
 
-Upon starting the app, the user is prompted with the 4 options below. I will now explain what happens 'behind the scenes' with each of the options.
+Upon starting the app, the user is prompted with the 6 different options:
 
-<h3 id="colours-and-fonts"> 2.1. Recording sales transactions</h3>
+<h2 id="transactions"> 2.1. Recording Transactions</h2>
+
+**1. Sales Transactions**
 
 When recording sales transactions, the user inputs the transaction date, what products were sold and what the quantities of these products were. The user is also asked whether the sale was on credit or if it the customer paid with cash. If it was on credit, the app creates an invoice for the purchase and uploads it to a folder on Google Drive. In either case the app generates a random transaction ID, enters the transaction data into the relevant ledger accounts, and updates inventory data in their respective worksheets on Google Sheets.
 
-<h3 id="colours-and-fonts"> 2.2. Recording Purchase transactions</h3>
+**2. Purchase Transactions**
 
 When recording purchase transactions, the process is largely similar to sales transactions, with the difference being the option to register the purchase of non-current assets. If the purchase was on credit, the user inputs the supplier invoice number. A randomised transaction ID is also generated, after which the data is entered to the relevant worksheets.
 
-<h3 id="colours-and-fonts"> 2.3. Recording Purchase transactions</h3>
+**3. Sales Receipts**
 
-<h3 id="colours-and-fonts"> 2.4. Recording Purchase transactions</h3>
+When recording a sales receipt, i.e. the receipt of an invoice payment from a customer, the user chooses the customer from whom they received the payment. Upon doing this, they will be prompted with all the invoices from the customer. They type in the invoice number and the amount received after which the receipt is updated into the relevant accounts.
 
+**4. Purchase Payments**
 
+When recording a purchase payment, i.e. the payment of a supplier invoice, the process is largely as that of the Sales Receipts'. The customer is prompted with their suppliers, and then the invoices in that supplier's account. The user enters this information after which the payment is updated into the relevant accounts.
 
-<h3 id="colours-and-fonts"> 2.5. Database Structure</h3>
+<h2 id="statistics"> 2.2. Statistics</h2>
+
+**5. Inventory status**
+
+When checking the inventory status the user is presented with the amount of all the different products currently in stock.
+
+**6. Profit margins**
+
+![\textrm{Profit margin} = \frac{\textrm{Sold value} - \textrm{Bought value}}{\textrm{Bought Value}} \times 100%](https://latex.codecogs.com/svg.image?\textrm{Profit&space;margin}&space;=&space;&space;\frac{\textrm{Sold&space;value}&space;-&space;\textrm{Bought&space;value}}{\textrm{Bought&space;Value}}&space;\times&space;100%)
+
+<h2 id="database"> 2.3. Database Structure</h2>
 
 Each worksheet in a spreadsheet have the same structure. There are some differences between spreadsheets but the structure is roughly the same.
 Columns 1-3 are the debit side with 3 keys and columns 4-6 are the credit side with 3 keys. The keys can vary between spreadsheets.
@@ -205,7 +222,7 @@ On top of these it would be fully possible to add the possibilities for integrat
 
 
 <!-- CONTACT -->
-<h2 id="contact">7. Contact</h2>
+<h1 id="contact">7. Contact</h1>
 
 Rebecca Perttula - [@uwuphoto](https://twitter.com/uwuphoto) - rebecca@perttula.co
 
@@ -214,14 +231,21 @@ Project Link: [https://beccauwu.github.io/accountspy-preview](https://beccauwu.g
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- Credits -->
-<h2 id="credits">8. Credits</h2>
+<h1 id="credits">8. Credits</h1>
 
 * **Richard Wells**
   
   My Code Institute mentor who has helped me tremendously throughout the project, giving tonnes of amazing advice and helped me figure out the solution to several difficult issues.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-</body>
+
+<h1 id="links">9. Links</h1>
+
+* [Database Google Drive folder](https://drive.google.com/drive/folders/1pOgtupYWIjwE0W5tDjbob2cMwOyht9K6?usp=sharing)
+* [Invoices Google Drive Folder](https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing)
+* [Live app on Heroku](https://rugged-kings-canyon-79210.herokuapp.com/)
+
+</div>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
@@ -237,20 +261,4 @@ Project Link: [https://beccauwu.github.io/accountspy-preview](https://beccauwu.g
 [linkedin-url]: https://linkedin.com/in/rebeccaperttula
 [product-screenshot]: assets/images/amiresponsive.png
 <!-- Site Captures -->
-[index]: assets/images/index.png
-[footer]: assets/images/footer.png
-[controls]: assets/images/controls.png
-[controls-landscape]: assets/images/controlswscore.png
-[landscape]: assets/images/landscape.png
-[portrait]: assets/images/portrait.png
-[dead]: assets/images/death.png
-[leaderboard]: assets/images/leaderboard.png
-[colours]: assets/images/colours.png
-[lighthouse]: assets/images/lighthouse.png
-![current assets account](assets/img/ca.png)
-![detailed product analysis](assets/img/dpa.png)
-![product stock summary](assets/img/pss.png)
-![receivables ledger](assets/img/rl.png)
-![trade receivables](assets/img/tr.png)
-![sales day book](assets/img/sdb.png)
-![invoice](assets/img/inv.png)
+[start]: assets/img/banner.png
