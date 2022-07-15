@@ -258,7 +258,7 @@ Cause 🛠: Return statement was indented too much
 
 Fix 💚: Change indentation of the return statement inside function
 
-![gif of the fix][transaction-id]
+<img src="assets/img/transaction-id.gif" alt="gif of the fix" height="200"/>
 
 ---------------
 
