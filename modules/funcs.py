@@ -2,7 +2,7 @@ from random import randint
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
-from modules.exportpdf import sort_data
+from exportpdf import sort_data
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",

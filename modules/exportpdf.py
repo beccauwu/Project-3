@@ -5,7 +5,7 @@ from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib.styles import ParagraphStyle
-from modules.gdriveupload import upload_to_folder
+from gdriveupload import upload_to_folder
 
 Creator = namedtuple("Creator", ["name", "email", "phone_num", "account", "vat_reg_no"])
 Customer = namedtuple("Customer", ["name", "address", "city", "postcode", "country"])
