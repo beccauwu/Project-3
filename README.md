@@ -62,8 +62,8 @@
     <li><a href="#bugs">5. Bugs</a></li>
     <li><a href="#deployment">6. Deployment</a></li>
     <li><a href="#future-enhancements">7. Future Enhancements</a></li>
-    <li><a href="#contact">8. Contact</a></li>
-    <li><a href="#credits">9. Credits</a></li>
+    <li><a href="#credits">8. Credits</a></li>
+    <li><a href="#links">9. Links</a></li>
   </ul>
 </details>
 
