@@ -2,7 +2,7 @@ from random import randint
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
-from exportpdf import sort_data
+from modules.exportpdf import sort_data
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -822,3 +822,5 @@ def current_profit_margin():
     print(f'Total value of sold products: {total_sold}')
     print(f'Total value of bought products: {total_bought}')
     print(f'Total profit margin: {profit_margin}%\n')
+
+print(STOCK.worksheet('Liquid Soap').row_values(4))

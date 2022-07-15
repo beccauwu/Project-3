@@ -123,9 +123,15 @@ When checking the inventory status the user is presented with the amount of all 
 
 **6. Profit margins**
 
-![\textrm{Profit margin} = \frac{\textrm{Sold value} - \textrm{Bought value}}{\textrm{Bought Value}} \times 100%](https://latex.codecogs.com/svg.image?\textrm{Profit&space;margin}&space;=&space;&space;\frac{\textrm{Sold&space;value}&space;-&space;\textrm{Bought&space;value}}{\textrm{Bought&space;Value}}&space;\times&space;100%)
+The profit margins for each product as well as the overall profit margin is calculated and shown using the formula:
 
-<h2 id="database"> 2.3. Database Structure</h2>
+$\textrm{Profit margin} = \frac{\textrm{Sold value} - \textrm{Bought value}}{\textrm{Bought Value}} \times 100\%$
+
+<h2 id="end"> 2.3. End</h2>
+
+After the user has input all relevant data and this is posted to the worksheets, or after the app has finished the all the tasks inside the chosen category, the user is asked whether they would like to go back to the start menu or not. If they do not the script stops executing.
+
+<h2 id="database"> 2.4. Database Structure</h2>
 
 Each worksheet in a spreadsheet have the same structure. There are some differences between spreadsheets but the structure is roughly the same.
 Columns 1-3 are the debit side with 3 keys and columns 4-6 are the credit side with 3 keys. The keys can vary between spreadsheets.
@@ -170,13 +176,57 @@ Below I have detailed what postings happen as a consequence of each type of tran
     Reportlab is used for generating invoices as PDF files.
 
 
-<h2 id="testing">3. Testing</h2>
+<h1 id="testing">3. Testing</h1>
 
-<h3 id="methods">3.1. Methodology and Results</h3>
+**Methodology**
 
-All the app functionality has been tested thoroughly and the code has been passed through pylint without issues.
+All the app functionality has been tested thoroughly as shown below and the code has been passed through pylint.
 
-validation and functionality
+**Tests in detail**
+
+---------------
+
+Implementation 🏭: On the different menus, I wanted an input number to redirect to its corresponding function and if an invalid value is entered to show an error message
+
+Test 🧪: I went through all the menus and typed correct and incorrect values in each of them
+
+Result 🏆: All the menus worked as expected, and all of them correctly printed an error message if an invalid value was entered
+
+Verdict ✅: The test passed as everything worked as expected
+
+---------------
+
+Implementation 🏭: When user is asked to input a date, I wanted to ensure the date is possible by checking if the given month has the number of days input, taking into account leap years. I also wanted to ensure the value entered is a date and not another string
+
+Test 🧪: I input incorrect values and dates outside of the range within a given month
+
+Result 🏆: The validation worked as expected, showing errors if the date entered is not possible to exist.
+
+Verdict ✅: The test passed with its current form of validation, changes are required for the user not to be able to input a date too far back in time as the validation is currently not checking for this. Changes are also required to not allow the date to be in the future as this does not make sense from a bookkeeping standpoint.
+
+---------------
+
+Implementation 🏭: When user is asked to select an invoice from a list, prohibit the input of a non-existent invoice by checking if entered invoice exists in the list.
+
+Test 🧪: I input invoices not in the list
+
+Result 🏆: The validation worked as expected, typing an invoice not on the list is not possible
+
+Verdict ✅: The test passed and everything worked as expected
+
+---------------
+
+Implementation 🏭: When generating both a random invoice number and transaction ID, I have the function check if said number already exists and if it does, continue generating a random number until it is unique. The number is then added to a database with its corresponding task.
+
+Test 🧪: This is not something that I am able to test as it relies on random numbers, but no duplicate values have been generated so far.
+
+Result 🏆: The validation should work as expected but as said it's not possible for me to see if it actually does
+
+Verdict ✅: I cannot give the test a verdict at this point, however if a value is created which is a duplicate on the list I will know that it doesn't work. Proving a negative isn't possible.
+
+---------------
+
+
 
 <h2 id="bugs">4. Bugs</h2>
 
