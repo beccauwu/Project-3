@@ -130,6 +130,7 @@ After the user has input all relevant data and this is posted to the worksheets,
 
 Each worksheet in a spreadsheet have the same structure. There are some differences between spreadsheets but the structure is roughly the same.
 Columns 1-3 are the debit side with 3 keys and columns 4-6 are the credit side with 3 keys. The keys can vary between spreadsheets.
+The exceptions to this format are the worksheets within the database spreadsheet. They are there to just hold data, nothing else so their format depends on the data they hold.
 
 | **Spreadsheet** 	| **Key** 	| **Key** 	| **Key** 	| **Key** 	| **Key** 	| **Key** 	|
 |:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|

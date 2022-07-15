@@ -2,6 +2,7 @@
 """
 
 from random import randint
+import time
 from progress.bar import ChargingBar
 import gspread
 from google.oauth2.service_account import Credentials
@@ -212,6 +213,7 @@ def choose_customer():
     while True:
         choise = input("Choose a customer (if adding a new customer, type 'n'): \n")
         if choise == 'n':
+            warning()
             name = input('Customer name:\n')
             new = new_account_number(last_account_no)
             new_worksheet(RECEIVABLES, '1255198903', name, new)
@@ -253,6 +255,7 @@ def choose_supplier():
     while True:
         choise = input("Choose a supplier (if adding a new customer, type 'n'): \n")
         if choise == 'n':
+            warning()
             name = input('Supplier name:\n')
             new = new_account_number(last_account_no)
             new_worksheet(PAYABLES, '1051717353', name, new)
@@ -825,3 +828,18 @@ def current_profit_margin():
     print(f'Total value of sold products: {total_sold}')
     print(f'Total value of bought products: {total_bought}')
     print(f'Total profit margin: {profit_margin}%\n')
+
+def warning():
+    """Prints a warning message so that user is aware
+    any information here is public
+    """
+    print_ls = [
+        '\n! W A R N I N G !\n',
+        'This app is for demonstration purposes only,',
+        'as such, the databases holding all information are publicly available.',
+        'Please do not add any information you would not like public here.',
+        'You are strongly advised not to use any real information anywhere in this app whatsoever.\n'
+    ]
+    for each in print_ls:
+        print(each)
+        time.sleep(0.2)
