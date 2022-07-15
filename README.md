@@ -131,22 +131,23 @@ After the user has input all relevant data and this is posted to the worksheets,
 Each worksheet in a spreadsheet have the same structure. There are some differences between spreadsheets but the structure is roughly the same.
 Columns 1-3 are the debit side with 3 keys and columns 4-6 are the credit side with 3 keys. The keys can vary between spreadsheets.
 
-|                 	|           	| **Dr**        	|         	|           	| **Cr**      	|         	|
-|-----------------	|-----------	|---------------	|---------	|-----------	|-------------	|---------	|
-| **Spreadsheet** 	| **Key**   	| **Key**       	| **Key** 	| **Key**   	| **Key**     	| **Key** 	|
-| Stock           	| Date      	| Amount Bought 	| Total   	| Date      	| Amount Sold 	| Total   	|
-| Payables        	| Narrative 	| Invoice NO    	| €       	| Narrative 	| Invoice NO  	| €       	|
-| Receivables     	| Narrative 	| Invoice NO    	| €       	| Narrative 	| Invoice NO  	| €       	|
-| General Ledger  	| Narrative 	| Ref           	| €       	| Narrative 	| Ref         	| €       	|
+| **Spreadsheet** 	| **Key** 	| **Key** 	| **Key** 	| **Key** 	| **Key** 	| **Key** 	|
+|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|
+| **Stock** 	| Date 	| Amount Bought 	| Total 	| Date 	| Amount Sold 	| Total 	|
+| **Payables** 	| Narrative 	| Invoice NO 	| € 	| Narrative 	| Invoice No 	| € 	|
+| **Receivables** 	| Narrative 	| Invoice NO 	| € 	| Narrative 	| Invoice NO 	| € 	|
+| **General Ledger** 	| Narrative 	| Ref 	| € 	| Narrative 	| Ref 	| € 	|
+| **Database**<br>(Invoice/Transaction ID) 	| Value 	| None 	| None 	| None 	| None 	| None 	|
+| **Database**<br>(Addresses) 	| Name 	| Address 	| City 	| Postcode 	| Country 	| None 	|
 
 Below I have detailed what postings happen as a consequence of each type of transaction. Horizontally are the transaction types and vertically the spreadsheets. The data in their cross section represents worksheets in the spreadsheets and whether the transaction is recorded on the debit or credit side in each of them.
 
-| Transaction/ Spreadsheet 	|              **Sales, Credit**              	|                 **Sales, Cash**                	|                 **Purchases, Credit**                	|             **Purchases, Cash**            	|                 **Sales Receipt**                 	|      **Purchase Payment**      	|
-|:------------------------:	|:-------------------------------------------:	|:----------------------------------------------:	|:----------------------------------------------------:	|:------------------------------------------:	|:-------------------------------------------------:	|:------------------------------:	|
-|    **General Ledger**    	| Trade Receivables (Dr), Current Assets (Cr) 	| Cash (Dr), Sales Tax (Dr), Current Assets (Cr) 	| Trade Payables (Cr), Current/Non-current Assets (Dr) 	| Cash (Cr), Current/Non-current Assets (Dr) 	| Trade Receivables (Cr), Cash (Dr), Sales Tax (Dr) 	| Trade Payables (Dr), Cash (Cr) 	|
-|       **Payables**       	|                     None                    	|                      None                      	|                 Supplier Account (Dr)                	|                    None                    	|                        None                       	|      Supplier Account (Cr)     	|
-|      **Receivables**     	|            Customer account (Cr)            	|                      None                      	|                         None                         	|                    None                    	|               Customer account (Dr)               	|              None              	|
-|         **Stock**        	|          Sold item(s) account (Cr)          	|                                                	|     If current asset: bought item(s) account (Dr)    	|                                            	|                        None                       	|              None              	|
+| Transaction/<br>Spreadsheet 	| **Sales, Credit** 	| **Sales, Cash** 	| **Purchases, Credit** 	| **Purchases, Cash** 	| **Sales Receipt** 	| **Purchase Payment** 	|
+|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|:---:	|
+| **General Ledger** 	| Trade Receivables (Dr),<br>Current Assets (Cr) 	| Cash (Dr),<br>Sales Tax (Dr),<br>Current Assets (Cr) 	| Trade Payables (Cr),<br>Current/Non-current<br>Assets (Dr) 	| Cash (Cr),<br>Current/Non-current<br>Assets (Dr) 	| Trade Receivables (Cr),<br>Cash (Dr),<br>Sales Tax (Dr) 	| Trade Payables (Dr),<br>Cash (Cr) 	|
+| **Payables** 	| None 	| None 	| Supplier Account (Dr) 	| None 	| None 	| Supplier Account (Cr) 	|
+| **Receivables** 	| Customer account (Cr) 	| None 	| None 	| None 	| Customer account (Dr) 	| None 	|
+| **Stock** 	| Sold item(s) account (Cr) 	| Sold item(s) account (Cr) 	| If current asset:<br>bought item(s) account (Dr) 	| If current asset:<br>bought item(s) account (Dr) 	| None 	| None 	|
 
 <h1 id="dependencies">3. Dependencies</h1>
 
@@ -211,7 +212,7 @@ Verdict ✅: The test passed and everything worked as expected
 
 ---------------
 
-Implementation 🏭: When generating both a random invoice number and transaction ID, I have the function check if said number already exists and if it does, continue generating a random number until it is unique. The number is then added to a database with its corresponding task.
+Implementation 🏭: When generating both a random invoice number and transaction ID, I have the function check if the generated value already exists. If it does, the function generates a new random value until it is unique. The number is then added to a database with its corresponding task
 
 Test 🧪: This is not something that I am able to test as it relies on random numbers, but no duplicate values have been generated so far.
 
@@ -223,14 +224,14 @@ Verdict ✅: I cannot give the test a verdict at this point, however if a value 
 
 **Pylint**
 
-I have pylint installed on VSCode so I have been able to sort out problems as they come. There are still some flags which I am aware of but they are not anything that impact the functionality of the app nor are they many times possible to solve:
+I have pylint installed on VSCode so I have been able to sort out problems as they come. There are still some flags which I am aware of but they are not anything that impact the functionality of the app nor are they many times possible to solve easily:
 
 * run.py 
   * **anomalous backslashes:**
     This error is due to the project logo print out at the start using backslashes to draw the logo. It is the best way to do it and I like having the logo there as a buffer when starting the app.
 * exportpdf.py
   * **variable name doesn't conform to snake_case naming style:**
-    The reason for the variables to be named that is to avoid confusion and in the case of variables 't' and 't2', the preferred names 'tbl' and 'tbl_two' are already used as parameters in the function which makes it impossible to rename them. Any other names would not be as clear as these are.
+    The reason for the variables to be named that is to avoid confusion and in the case of variables 't' and 't2', the preferred names 'tbl' and 'tbl_two' are already being used as parameters in the function which makes it impossible to rename them. Any other names would not be as clear as these are.
 
 <img src="assets/img/invalid-name.png" alt="Screenshot of function with invalid name error" height="400"/>
 
@@ -240,13 +241,13 @@ I have pylint installed on VSCode so I have been able to sort out problems as th
 
 ---------------
 
-Bug 🐝: App appended a line in the spreadsheet it was writing to instead of writing on the same line as the existing text was on.
+Bug 🐝: App appended a line in the spreadsheet it was writing to instead of writing on the same line as the existing text was on
 
-Cause 🛠: The append_data function used the worksheet.append_row funtion instead of updating the sheet with new data.
+Cause 🛠: The append_data function used the worksheet.append_row funtion instead of updating the sheet with new data
 
 <img src="assets/img/old-appd.png" alt="screenshot of the old version of append_data" height="400"/>
 
-Fix 💚: Modify append_data, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replace the original values.
+Fix 💚: Modify append_data, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replace the original values
 
 <img src="assets/img/new-appd.png" alt="screenshot of the new version of append_data" height="650"/>
 
@@ -275,7 +276,7 @@ Fix 💚: Convert the string to uppercase before adding it to the invoice
 
 I deployed the page on Heroku via the following procedure:
 
-1. Sign up or log in to heroku and open the [heroku dashboard](https://dashboard.heroku.com/)
+1. Sign up or log in to heroku and open [heroku dashboard](https://dashboard.heroku.com/)
 2. Select 'Create New App'
 3. Name the project (must be a unique name), choose your region and click 'Create'
 4. Navigate to the settings tab (must be done before deploying code)
