@@ -41,34 +41,29 @@
   <ul id="table-of-contents">
     <li><a href="#introduction">1. Introduction</a></li>
     <li>
-      <a href="#styling">2. Functionality in detail</a>
+      <a href="#features">2. Features</a>
       <ul>
         <li>
-          <a href="#colours-and-fonts">2.1. Recording a sale</a>
+          <a href="#transactions">2.1. Recording Transactions</a>
         </li>
         <li>
-        <a href="#pages">2.2 Recording a purchase</a>
+        <a href="#statistics">2.2 Statistics</a>
         </li>
         <li>
-        <a href="#pages">2.2 Recording a sales receipt</a>
+        <a href="#end">2.3 End</a>
         </li>
         <li>
-        <a href="#pages">2.2 Recording a purchase payment</a>
+        <a href="#database">2.4 Database Structure</a>
         </li>
       </ul>
     </li>
-    <li>
-    <a href="#testing">3. Testing</a>
-      <ul>
-        <li><a href="#methods">3.1. Methodology and Results</a></li>
-        <li><a href="#issues">3.2. Issues During Testing</a></li>
-      </ul>
-    </li>
-    <li><a href="#bugs">4. Bugs</a></li>
-    <li><a href="#deployment">5. Deployment</a></li>
-    <li><a href="#future-enhancements">6. Future Enhancements</a></li>
-    <li><a href="#contact">7. Contact</a></li>
-    <li><a href="#credits">8. Credits</a></li>
+    <li><a href="#dependencies">3. Dependencies</a></li>
+    <li><a href="#testing">4. Testing</a></li>
+    <li><a href="#bugs">5. Bugs</a></li>
+    <li><a href="#deployment">6. Deployment</a></li>
+    <li><a href="#future-enhancements">7. Future Enhancements</a></li>
+    <li><a href="#contact">8. Contact</a></li>
+    <li><a href="#credits">9. Credits</a></li>
   </ul>
 </details>
 
@@ -153,7 +148,7 @@ Below I have detailed what postings happen as a consequence of each type of tran
 |      **Receivables**     	|            Customer account (Cr)            	|                      None                      	|                         None                         	|                    None                    	|               Customer account (Dr)               	|              None              	|
 |         **Stock**        	|          Sold item(s) account (Cr)          	|                                                	|     If current asset: bought item(s) account (Dr)    	|                                            	|                        None                       	|              None              	|
 
-<h3 id="pages">2.6. Dependencies</h3>
+<h1 id="dependencies">3. Dependencies</h1>
 
 * [Collections](https://docs.python.org/3/library/collections.html#module-collections)
 
@@ -176,7 +171,7 @@ Below I have detailed what postings happen as a consequence of each type of tran
     Reportlab is used for generating invoices as PDF files.
 
 
-<h1 id="testing">3. Testing</h1>
+<h1 id="testing">4. Testing</h1>
 
 **Methodology**
 
@@ -237,46 +232,46 @@ I have pylint installed on VSCode so I have been able to sort out problems as th
   * **variable name doesn't conform to snake_case naming style:**
     The reason for the variables to be named that is to avoid confusion and in the case of variables 't' and 't2', the preferred names 'tbl' and 'tbl_two' are already used as parameters in the function which makes it impossible to rename them. Any other names would not be as clear as these are.
 
-![Screenshot of function with invalid name error][invalid-name]
+<img src="assets/img/invalid-name.png" alt="Screenshot of function with invalid name error" height="400"/>
 
-<h2 id="bugs">4. Bugs</h2>
+<h2 id="bugs">5. Bugs</h2>
 
 **Fixed**
 
 ---------------
 
-Bug: App appended a line in the spreadsheet it was writing to instead of writing on the same line as the existing text was on.
+Bug 🐝: App appended a line in the spreadsheet it was writing to instead of writing on the same line as the existing text was on.
 
-Cause: The append_data function used the worksheet.append_row funtion instead of updating the sheet with new data.
+Cause 🛠: The append_data function used the worksheet.append_row funtion instead of updating the sheet with new data.
 
-![screenshot of the old version of append_data][old-appd]
+<img src="assets/img/old-appd.png" alt="screenshot of the old version of append_data" height="400"/>
 
-Fix: Modify append_data, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replaces the original values.
+Fix 💚: Modify append_data, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replace the original values.
 
-![screenshot of the new version of append_data][new-appd]
+<img src="assets/img/new-appd.png" alt="screenshot of the new version of append_data" height="650"/>
 
 ---------------
 
-Bug: When generating a transaction ID the app got stuck in a loop
+Bug 🐝: When generating a transaction ID the app got stuck in a loop
 
-Cause: Return statement was indented too much
+Cause 🛠: Return statement was indented too much
 
-Fix: Change indentation of the return statement inside function
+Fix 💚: Change indentation of the return statement inside function
 
 ![gif of the fix][transaction-id]
 
 ---------------
 
-Bug: When creating an invoice, the country of the customer was not printed
+Bug: 🐝 When creating an invoice, the country of the customer was not printed
 
-Cause: The formatting of the paragraph string made it not work
+Cause 🛠: The formatting of the paragraph string made it not work
 
-Fix: Convert the string to uppercase before adding it to the invoice
+Fix 💚: Convert the string to uppercase before adding it to the invoice
 
 ---------------
 
 
-<h1 id="deployment">5. Deployment</h1>
+<h1 id="deployment">6. Deployment</h1>
 
 I deployed the page on Heroku via the following procedure:
 
@@ -298,7 +293,7 @@ I deployed the page on Heroku via the following procedure:
 
 You can find the live site via the following URL - [accountspy-preview live webpage](https://rugged-kings-canyon-79210.herokuapp.com/)
 
-<h2 id="future-enhancements">6. Future Enhancements</h2>
+<h2 id="future-enhancements">7. Future Enhancements</h2>
 
 I will be working on the full version of the app in the future, where all functionality will be user configurable through the use of classes. I didn't see this as practical for this app as for demonstration purposes, most data would have to be preconfigured. In the full version there will be features I wasn't able to include here, which would perhaps make the app practical for some medium-sized businesses. Examples of planned features:
 
@@ -315,7 +310,7 @@ On top of these it would be fully possible to add the possibilities for integrat
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- Credits -->
-<h1 id="credits">7. Credits</h1>
+<h1 id="credits">8. Credits</h1>
 
 * **Richard Wells**
   
@@ -323,7 +318,7 @@ On top of these it would be fully possible to add the possibilities for integrat
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<h1 id="links">8. Links</h1>
+<h1 id="links">9. Links</h1>
 
 * [Database Google Drive folder](https://drive.google.com/drive/folders/1pOgtupYWIjwE0W5tDjbob2cMwOyht9K6?usp=sharing)
 * [Invoices Google Drive Folder](https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing)
