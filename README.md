@@ -346,6 +346,9 @@ On top of these it would be fully possible to add integrations for Electronic Fu
 * [Database Google Drive folder](https://drive.google.com/drive/folders/1pOgtupYWIjwE0W5tDjbob2cMwOyht9K6?usp=sharing)
 * [Invoices Google Drive Folder](https://drive.google.com/drive/folders/1_C-fAnZgSmfio28gpGks6ZPZRlW9G981?usp=sharing)
 * [Live app on Heroku](https://rugged-kings-canyon-79210.herokuapp.com/)
+* [Full version](https://github.com/beccauwu/accountspy)
+
+  -> as of writing this the full version is only a copy of this repository but it will be updated continuously
 
 </div>
 
