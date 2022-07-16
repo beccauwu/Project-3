@@ -548,7 +548,7 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None, tran
         if ttype == 1:
             gross = float(get_gross_total(product, amount))
             grosses.append(gross)
-            stock_itms.append([STOCK, product, [date, amount, gross], False])
+            stock_itms.append([STOCK, product, [date, float(amount), float(gross)], False])
         if ttype == 2:
             price = float(itm[2])
             grosses.append(price)
@@ -558,7 +558,7 @@ def make_item_list(date: str, items: list, ttype: int, extratype:int= None, tran
             if extratype == 2:
                 stock_itms.append([GENERAL_LEDGER, 'Current Assets',
                                    [product, trans_id, price], True])
-                stock_itms.append([STOCK, product, [date, amount, price], True])
+                stock_itms.append([STOCK, product, [date, float(amount), float(price)], True])
     gross_total = float(sum(grosses))
     return [stock_itms, gross_total]
 
@@ -766,6 +766,11 @@ def append_data(data_list):
             if data[3] and len(vals) != 0:
                 if not vals[len(vals)-1][0]:
                     for val in vals:
+                        for i in val:
+                            try:
+                                i = float(i)
+                            except ValueError:
+                                pass
                         if val[0] and val[3] and continue_loop:
                             continue
                         if not val[0] and continue_loop:
@@ -780,6 +785,11 @@ def append_data(data_list):
                     vals.append(data_to_write)
             elif len(vals) != 0:
                 for val in vals:
+                    for i in val:
+                        try:
+                            i = float(i)
+                        except ValueError:
+                            pass
                     while True:
                         if not val[3] and continue_loop:
                             del val[3:]
@@ -787,11 +797,18 @@ def append_data(data_list):
                             continue_loop = False
                         break
             elif data[3]:
+                for val in vals:
+                    for i in val:
+                        try:
+                            i = float(i)
+                        except ValueError:
+                            pass
                 vals.append(data_to_write)
             else:
                 new_row = ['','','']
                 new_row.extend(data_to_write)
                 vals.append(new_row)
+            print(vals)
             sheet.update('A4:J', vals)
             progress_bar.next()
     print('Operation Successful.')
@@ -802,8 +819,11 @@ def product_stock_amount():
     worksheets = get_worksheet_titles(STOCK)[1:]
     for worksheet in worksheets:
         wsh = STOCK.worksheet(worksheet)
-        stock_amount = wsh.acell('H3').value
+        bought = sum([int(num) for num in wsh.col_values(2)[3:]])
+        sold = sum([int(num) for num in wsh.col_values(5)[3:]])
+        stock_amount = bought-sold
         print(f'{worksheet}: {stock_amount} in stock')
+    print('\n')
 
 def current_profit_margin():
     """Calculates profit margins for individual products and
@@ -814,20 +834,25 @@ def current_profit_margin():
     sold_vals = []
     for worksheet in worksheets:
         wsh = STOCK.worksheet(worksheet)
-        bought_val = float(wsh.acell('I3').value)
-        sold_val = float(wsh.acell('J3').value)
+        col_b = sum([float(num) for num in wsh.col_values(2)[3:]])
+        col_c = sum([float(num) for num in wsh.col_values(3)[3:]])
+        col_e = sum([float(num) for num in wsh.col_values(5)[3:]])
+        col_f = sum([float(num) for num in wsh.col_values(6)[3:]])
+        bought_val = round(col_c/col_b*col_e, 2)
+        sold_val = col_f
         bought_vals.append(bought_val)
         sold_vals.append(sold_val)
         product_profit_margin = round(float((sold_val-bought_val) / bought_val * 100), 2)
-        print(f'Value of sold {worksheet}s: {sold_val}')
-        print(f'Value of bought {worksheet}s: {bought_val}')
+        print(f'Value of sold {worksheet}s: €{sold_val}')
+        print(f'Value of bought {worksheet}s: €{bought_val}')
         print(f'{worksheet} profit margin: {product_profit_margin}%\n')
     total_bought = sum(bought_vals)
     total_sold = sum(sold_vals)
     profit_margin = round(float((total_sold-total_bought) / total_bought * 100), 2)
-    print(f'Total value of sold products: {total_sold}')
-    print(f'Total value of bought products: {total_bought}')
+    print(f'Total value of sold products: €{total_sold}')
+    print(f'Total value of bought products: €{total_bought}')
     print(f'Total profit margin: {profit_margin}%\n')
+
 
 def warning():
     """Prints a warning message so that user is aware

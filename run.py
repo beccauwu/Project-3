@@ -35,12 +35,12 @@ def start():
             purchase_payments()
             break
         if choise == '5':
-            print("Getting current inventory...")
+            print("Getting current inventory...\n")
             funcs.product_stock_amount()
             start_over()
             break
         if choise == '6':
-            print("Calculating profit margins...")
+            print("Calculating profit margins...\n")
             funcs.current_profit_margin()
             start_over()
             break
