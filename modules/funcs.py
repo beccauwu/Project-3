@@ -253,7 +253,7 @@ def choose_supplier():
         print(f"{num}. {supplier}")
         num += 1
     while True:
-        choise = input("Choose a supplier (if adding a new customer, type 'n'): \n")
+        choise = input("Choose a supplier (if adding a new supplier, type 'n'): \n")
         if choise == 'n':
             warning()
             name = input('Supplier name:\n')

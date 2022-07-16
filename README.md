@@ -96,17 +96,25 @@ Upon starting the app, the user is prompted with the 6 different options:
 
 **1. Sales Transactions**
 
+![screenshot of sales option][sales]
+
 When recording sales transactions, the user inputs the transaction date, what products were sold and what the quantities of these products were. The user is also asked whether the sale was on credit or if it the customer paid with cash. If it was on credit, the app creates an invoice for the purchase and uploads it to a folder on Google Drive. In either case the app generates a random transaction ID, enters the transaction data into the relevant ledger accounts, and updates inventory data in their respective worksheets on Google Sheets.
 
 **2. Purchase Transactions**
+
+![screenshot of purchases option][purchases]
 
 When recording purchase transactions, the process is largely similar to sales transactions, with the difference being the option to register the purchase of non-current assets. If the purchase was on credit, the user inputs the supplier invoice number. A randomised transaction ID is also generated, after which the data is entered to the relevant worksheets.
 
 **3. Sales Receipts**
 
+![screenshot of sales receipts option][sales-receipts]
+
 When recording a sales receipt, i.e. the receipt of an invoice payment from a customer, the user chooses the customer from whom they received the payment. Upon doing this, they will be prompted with all the invoices from the customer. They type in the invoice number and the amount received after which the receipt is updated into the relevant accounts.
 
 **4. Purchase Payments**
+
+![screenshot of purchase payments option][purchase-payments]
 
 When recording a purchase payment, i.e. the payment of a supplier invoice, the process is largely as that of the Sales Receipts'. The customer is prompted with their suppliers, and then the invoices in that supplier's account. The user enters this information after which the payment is updated into the relevant accounts.
 
@@ -114,9 +122,13 @@ When recording a purchase payment, i.e. the payment of a supplier invoice, the p
 
 **5. Inventory status**
 
+![screenshot of inventory status option][inventory]
+
 When checking the inventory status the user is presented with the amount of all the different products currently in stock.
 
 **6. Profit margins**
+
+![screenshot of profit margins option][profit-margin]
 
 The profit margins for each product as well as the overall profit margin is calculated and shown using the formula:
 
@@ -265,11 +277,23 @@ Fix 💚: Change indentation of the return statement inside function
 
 ---------------
 
-Bug: 🐝 When creating an invoice, the country of the customer was not printed
+Bug 🐝: When creating an invoice, the country of the customer was not printed
 
 Cause 🛠: The formatting of the paragraph string made it not work
 
 Fix 💚: Convert the string to uppercase before adding it to the invoice
+
+---------------
+
+Bug 🐝: When updating worksheet with floats, the value would have an added semicolon in front of it, making calculations made within the worksheet not work
+
+<img src="assets/img/semicolon.png" alt="screenshot of semicolon issue" height="300"/>
+
+Cause 🛠: I haven't found a cause for it anywhere despite thorough research of gspread docs and asking online
+
+Fix 💚: Move calculations made in worksheet to python where the values could be converted to floats
+
+<img src="assets/img/semicolon-fix.png" alt="screenshot of fx for semicolon issue" height="350"/>
 
 ---------------
 
@@ -343,7 +367,15 @@ On top of these it would be fully possible to add integrations for Electronic Fu
 [linkedin-url]: https://linkedin.com/in/rebeccaperttula
 <!-- Site Captures -->
 [start]: assets/img/banner.png
+[sales]: assets/img/sales.png
+[purchases]: assets/img/purchases.png
+[sales-receipts]: assets/img/sales-receipts.png
+[purchase-payments]: assets/img/purchase-payments.png
+[inventory]: assets/img/inventory.png
+[profit-margin]: assets/img/profit-margin.png
 [invalid-name]: assets/img/invalid-name.png
 [old-appd]: assets/img/old-appd.png
 [new-appd]: assets/img/new-appd.png
 [transaction-id]: assets/img/transaction-id.gif
+[semicolon]: assets/img/semicolon.png
+[semicolon-fix]: assets/img/semicolon-fix.png
