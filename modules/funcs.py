@@ -762,10 +762,15 @@ def append_data(data_list):
             sheet = spreadsheet.worksheet(worksheet)
             vals = sheet.get_all_values()[3:]
             continue_loop = True
-            condition_1 = data[3] and len(vals) != 0
-            condition_2 = vals[-1][0] and vals[-1][3]
             pos = 0
-            if condition_1 and not condition_2:
+            if not vals:
+                if data[3]:
+                    vals.append(data_to_write)
+                else:
+                    new_row = ['','','']
+                    new_row.extend(data_to_write)
+                    vals.append(new_row)
+            elif data[3] and not (vals[-1][0] and vals[-1][3]):
                 if not vals[len(vals)-1][0]:
                     for val in vals:
                         if val[0] and val[3] and continue_loop:
@@ -780,22 +785,15 @@ def append_data(data_list):
                         break
                 else:
                     vals.append(data_to_write)
-            elif len(vals) != 0:
-                for val in vals:
-                    while True:
-                        if not val[3] and continue_loop:
-                            del val[3:]
-                            val.extend(data_to_write)
-                            continue_loop = False
-                        break
+            elif not data[3] and not (vals[-1][0] and vals[-1][3]):
+                del vals[-1][3:]
+                vals[-1].extend(data_to_write)
             elif data[3]:
-                for val in vals:
-                    vals.append(data_to_write)
+                vals.append(data_to_write)
             else:
                 new_row = ['','','']
                 new_row.extend(data_to_write)
                 vals.append(new_row)
-            print(vals)
             sheet.update('A4:J', vals)
             progress_bar.next()
     print('Operation Successful.')
