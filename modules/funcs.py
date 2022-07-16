@@ -766,11 +766,6 @@ def append_data(data_list):
             if data[3] and len(vals) != 0:
                 if not vals[len(vals)-1][0]:
                     for val in vals:
-                        for i in val:
-                            try:
-                                i = float(i)
-                            except ValueError:
-                                pass
                         if val[0] and val[3] and continue_loop:
                             continue
                         if not val[0] and continue_loop:
@@ -785,11 +780,6 @@ def append_data(data_list):
                     vals.append(data_to_write)
             elif len(vals) != 0:
                 for val in vals:
-                    for i in val:
-                        try:
-                            i = float(i)
-                        except ValueError:
-                            pass
                     while True:
                         if not val[3] and continue_loop:
                             del val[3:]
@@ -798,11 +788,6 @@ def append_data(data_list):
                         break
             elif data[3]:
                 for val in vals:
-                    for i in val:
-                        try:
-                            i = float(i)
-                        except ValueError:
-                            pass
                 vals.append(data_to_write)
             else:
                 new_row = ['','','']
