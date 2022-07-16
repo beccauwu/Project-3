@@ -762,8 +762,10 @@ def append_data(data_list):
             sheet = spreadsheet.worksheet(worksheet)
             vals = sheet.get_all_values()[3:]
             continue_loop = True
+            condition_1 = data[3] and len(vals) != 0
+            condition_2 = vals[-1][0] and vals[-1][3]
             pos = 0
-            if data[3] and len(vals) != 0:
+            if condition_1 and not condition_2:
                 if not vals[len(vals)-1][0]:
                     for val in vals:
                         if val[0] and val[3] and continue_loop:
