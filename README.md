@@ -70,7 +70,7 @@
 
 
 <!-- Introduction -->
-<h1 id="introduction">1. Introduction</h2>
+<h1 id="introduction">1. Introduction</h1>
 
 [![start menu screenshot][start]](https://beccauwu.github.io/accountspy-preview)
 
@@ -173,9 +173,9 @@ Below I have detailed what postings happen as a consequence of each type of tran
 
     Google Drive API is used to upload files to Google Drive.
 
-* [GSpread](https://github.com/burnash/gspread)
+* [gspread](https://github.com/burnash/gspread)
 
-    Gspread is used to update worksheets with data and creating worksheets.
+    gspread is used to update worksheets with data and creating worksheets.
 
 * [Progress](https://pypi.org/project/progress/)
 
@@ -249,11 +249,7 @@ I have pylint installed on VSCode so I have been able to sort out problems as th
 
 <img src="assets/img/invalid-name.png" alt="Screenshot of function with invalid name error" height="400"/>
 
-<h2 id="bugs">5. Bugs</h2>
-
-**Fixed**
-
----------------
+<h1 id="bugs">5. Bugs</h1>
 
 Bug 🐝: App appended a line in the spreadsheet it was writing to instead of writing on the same line as the existing text was on
 
@@ -261,7 +257,7 @@ Cause 🛠: The append_data function used the worksheet.append_row funtion inste
 
 <img src="assets/img/old-appd.png" alt="screenshot of the old version of append_data" height="400"/>
 
-Fix 💚: Modify append_data, to instead of using GSpread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replace the original values
+Fix 💚: Modify append_data, to instead of using gspread append_row use sheet.update where the data is written to the existing sheet values. The updated values then replace the original values
 
 <img src="assets/img/new-appd.png" alt="screenshot of the new version of append_data" height="650"/>
 
@@ -320,7 +316,7 @@ I deployed the page on Heroku via the following procedure:
 
 You can find the live site via the following URL - [accountspy-preview live webpage](https://rugged-kings-canyon-79210.herokuapp.com/)
 
-<h2 id="future-enhancements">7. Future Enhancements</h2>
+<h1 id="future-enhancements">7. Future Enhancements</h1>
 
 I will be working on the full version of the app in the future, where all functionality will be user configurable through the use of classes. I didn't see this as practical for this app as for demonstration purposes, most data would have to be preconfigured. In the full version there will be features I wasn't able to include here, which would perhaps make the app practical for some medium-sized businesses. Examples of planned features:
 
