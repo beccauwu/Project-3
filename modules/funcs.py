@@ -788,7 +788,7 @@ def append_data(data_list):
                         break
             elif data[3]:
                 for val in vals:
-                vals.append(data_to_write)
+                    vals.append(data_to_write)
             else:
                 new_row = ['','','']
                 new_row.extend(data_to_write)
