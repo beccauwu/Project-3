@@ -834,7 +834,7 @@ def warning():
     any information here is public
     """
     print_ls = [
-        '\n! W A R N I N G !\n',
+        '\n------ W A R N I N G ------\n',
         'This app is for demonstration purposes only,',
         'as such, the databases holding all information are publicly available.',
         'Please do not add any information you would not like public here.',
