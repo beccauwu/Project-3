@@ -140,6 +140,8 @@ def register_sales_receipt(data):
     trans_id = data[2]
     amount = data[3]
     inv_no = data[4]
+    issued = sum([float(num) for num in RECEIVABLES.worksheet(customer).col_values(3)[3:]])
+    paid = sum([float(num) for num in RECEIVABLES.worksheet(customer).col_values(6)[3:]])
     data_ls = [
         [GENERAL_LEDGER, 'Trade Receivables', [account_no, trans_id, amount], True],
         [GENERAL_LEDGER, 'Cash', ['GL300', trans_id, amount * 0.75], True],
@@ -147,8 +149,7 @@ def register_sales_receipt(data):
         [RECEIVABLES, customer, ['Payment', amount, inv_no], False]
     ]
     append_data(data_ls)
-    print(f"Outstanding balance on {customer}'s account:")
-    print(RECEIVABLES.worksheet(customer).acell('H3').value)
+    print(f"Outstanding balance on {customer}'s account: €{issued-paid}")
 
 def register_purchase_payment(data):
     """passes purchase payment data to append_data
@@ -162,14 +163,15 @@ def register_purchase_payment(data):
     trans_id = data[2]
     amount = data[3]
     inv_no = data[4]
+    issued = sum([float(num) for num in PAYABLES.worksheet(supplier).col_values(3)[3:]])
+    paid = sum([float(num) for num in PAYABLES.worksheet(supplier).col_values(6)[3:]])
     data_ls = [
         [GENERAL_LEDGER, 'Trade Payables', [account_no, trans_id, amount], False],
         [GENERAL_LEDGER, 'Cash', ['GL400', trans_id, amount], True],
         [PAYABLES, supplier, ['Payment', inv_no, amount], False]
     ]
     append_data(data_ls)
-    print(f"Outstanding balance on {supplier}'s account:")
-    print(PAYABLES.worksheet(supplier).acell('H3').value)
+    print(f"Outstanding balance on {supplier}'s account: €{issued-paid}")
 
 def purchases_menu():
     """creates list of items purchased
