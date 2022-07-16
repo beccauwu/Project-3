@@ -23,12 +23,12 @@ GENERAL_LEDGER = GSPREAD_CLIENT.open('general ledger')
 DATABASE = GSPREAD_CLIENT.open('database')
 STOCK = GSPREAD_CLIENT.open('stock')
 
-
-
-
 def product_menu():
     """
     prints products and based on choise calls a parent
+
+    returns:
+        list: [product, amount]
     """
     print(
         """
@@ -58,6 +58,9 @@ def product_menu():
 def product_menu_purchase():
     """
     prints products and based on choise calls a parent
+
+    returns:
+        list: [product, amount, price]
     """
     print(
         """
@@ -91,8 +94,14 @@ def product_menu_purchase():
 def sales_receipts_menu(customer, account):
     """
     Enters records of sales receipts into relevant accounts
+
+    Args:
+        customer (str): customer that made payment
+        account (str): account number of customer
+
+    Returns:
+        list: [customer, account, trans_id, amount, invoice]
     """
-    print('Choose customer who made the payment\n')
     inv_nos = RECEIVABLES.worksheet(customer).col_values(2)[3:]
     print(inv_nos)
     trans_id = get_trans_id('SR')
@@ -111,6 +120,13 @@ def sales_receipts_menu(customer, account):
 def purchase_payments_menu(supplier, account):
     """
     Enters records of purchase payments into relevant accounts
+
+    Args:
+        supplier (str): supplier payment was made to
+        account (str): account number of supplier
+
+    Returns:
+        list: [supplier, account, trans_id, amount, invoice]
     """
     inv_nos = PAYABLES.worksheet(supplier).col_values(2)[3:]
     print(inv_nos)
@@ -175,9 +191,9 @@ def register_purchase_payment(data):
 
 def purchases_menu():
     """creates list of items purchased
+
     Returns:
-        list: list with items
-        [[product, price]]
+        list: [[product, price]]
     """
     print(
         """
@@ -196,9 +212,6 @@ def purchases_menu():
             return no_of_products(), 'Non-Current Assets'
         print('Entered value is not valid.')
         print('Please try again.')
-
-
-
 
 def choose_customer():
     """Show existing customers and add new if not in list
@@ -239,8 +252,6 @@ def choose_customer():
             address_row = DATABASE.worksheet('addresses').find(customer).row
             address = DATABASE.worksheet('addresses').row_values(address_row)
             return [account_no, address]
-
-
 
 def choose_supplier():
     """Show existing suppliers and add new if not in list
@@ -346,7 +357,7 @@ def enter_products():
         num2 (int): number of products to enter in total
 
     Returns:
-        _type_: _description_
+        list: [product, amount, price]
     """
     print('What product did you buy?\n')
     while True:
@@ -376,6 +387,9 @@ def how_many(var):
 def cash_or_credit(trans_type: str):
     """
     checks type of transaction
+
+    Args:
+        trans_type (str): type of transaction
     """
     print(f"--------{trans_type}s--------\n1. Credit {trans_type}\n2. Cash {trans_type}\n")
     while True:
@@ -407,12 +421,10 @@ def check_if_date(date):
         date (str): date to check
 
     Returns:
-        True if is correct format,
-        False if not
+        Bool: True if is correct format,
+              False if not
     """
-    #correct length?
     if len(date) == 8:
-        #if uneven month, see if value of days is less than 32
         if int(date[1]) % 2 != 0:
             try:
                 int(date[0:2]) < 32
@@ -420,7 +432,6 @@ def check_if_date(date):
                 print(f'The month entered does not have {uneven} days.')
                 print('Please try again.')
                 return False
-        #if even month see if value of days is less than 31
         elif int(date[1]) % 2 == 0:
             try:
                 int(date[0:2]) < 31
@@ -428,7 +439,6 @@ def check_if_date(date):
                 print(f'The month entered does not have {even} days.')
                 print('Please try again.')
                 return False
-        #if february leap year see if value of days less than 30
         elif int(date[4:8]) % 4 == 0 and int(date[4:8]) % 100 != 0:
             try:
                 int(date[0:2]) < 30
@@ -436,7 +446,6 @@ def check_if_date(date):
                 print(f'The month entered does not have {leap} days.')
                 print('Please try again.')
                 return False
-        #if february non leap year see if value of days less than 29
         elif int(date[4:8]) % 4 != 0:
             try:
                 int(date[0:2]) < 29
@@ -444,7 +453,6 @@ def check_if_date(date):
                 print(f'The month entered does not have {non_leap} days.')
                 print('Please try again.')
                 return False
-        #check that month number is less than 13
         try:
             int(date[2:4]) < 13
         except ValueError as val_err:
@@ -466,7 +474,7 @@ def get_gross_total(product: str, amount: int):
         amount (int): amount sold
 
     Returns:
-        _type_: _description_
+        int: gross total for product
     """
     product_prices = {
         'Soap Bar': 6,
@@ -523,8 +531,8 @@ def is_item_in_list(lst, item):
         item (any): item to check
 
     Returns:
-        boolean: True if it exists,
-        False if not
+        bool: True if it exists,
+              False if not
     """
     for i in lst:
         if str(item) == str(i):
@@ -585,17 +593,12 @@ def sort_cr_sale_data(details: list, date: str, customer: list):
     write_cr_sale(data, get_data[0])
     sort_data(order, date, inv_no, trans_id, name, address)
 
-
-#write data
-
-
 def write_cr_sale(data, stock_list):
     """passes transaction data to append_data
 
     Args:
-        details (list): [product name, amount]
-        date (str): transaction date
-        customer (list): [customer name, account number]
+        data (list): data to write
+        stock_list (list): list of items to add to data
     """
     name = data[0]
     account_no = data[1]
@@ -634,9 +637,9 @@ def write_cr_purchase(itms, data, acct):
     """passes transaction data to append_data
 
     Args:
-        details (list): [product name, amount]
-        date (str): transaction date
-        supplier (list): [supplier name, account number]
+        itms (list): items bought
+        data (list): data to write
+        acct (str): type of asset bought
     """
     account_no = data[2]
     name = data[1]
@@ -660,8 +663,9 @@ def write_dr_purchase(itms, date, acct):
     """passes transaction data to append_data
 
     Args:
-        details (list): product name, amount
-        date (str): transaction date
+        itms (list): items bought
+        date (str): date of purchase
+        acct (str): type of asset bought
     """
     trans_id = get_trans_id('PD')
     if acct == 'Non-Current Assets':
@@ -675,11 +679,6 @@ def write_dr_purchase(itms, date, acct):
     for itm in get_data[0]:
         data_ls.append(itm)
     append_data(data_ls)
-
-
-
-
-#gspread stuff
 
 def new_worksheet(spreadsheet, wsh_id, title, code):
     """creates a new worksheet using a base template
@@ -700,10 +699,10 @@ def new_account_number(last):
     """Gets a new account number for new worksheets
 
     Args:
-        ssh (var): spreadsheet to index
+        last (str): last account number
 
     Returns:
-        int: new number
+        str: new account number
     """
     print('Generating account number...\n')
     code = last[0:2]
@@ -733,13 +732,14 @@ def get_worksheet_titles(spreadsheet):
 
     Args:
         spreadsheet (var): spreadsheet to index
+
+    Returns:
+        list: list of worksheets in spreadsheet
     """
     worksheet_list = []
     for worksheet in spreadsheet.worksheets():
         worksheet_list.append(worksheet.title)
     return worksheet_list
-
-
 
 def append_data(data_list):
     """Updates specified sheet with data
@@ -839,7 +839,6 @@ def current_profit_margin():
     print(f'Total value of sold products: €{total_sold}')
     print(f'Total value of bought products: €{total_bought}')
     print(f'Total profit margin: {profit_margin}%\n')
-
 
 def warning():
     """Prints a warning message so that user is aware

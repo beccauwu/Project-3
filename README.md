@@ -318,7 +318,7 @@ You can find the live site via the following URL - [accountspy-preview live webp
 
 <h1 id="future-enhancements">7. Future Enhancements</h1>
 
-I will be working on the full version of the app in the future, where all functionality will be user configurable through the use of classes. I didn't see this as practical for this app as for demonstration purposes, most data would have to be preconfigured. In the full version there will be features I wasn't able to include here, which would perhaps make the app practical for some medium-sized businesses. Examples of planned features:
+I will be working on the full version of the app in the future, where all functionality will be user configurable through the use of classes. I didn't see this as practical for this app as for demonstration purposes, most data would have to be preconfigured. In the full version there will be features I wasn't able to include here, which would perhaps make the app very useful for some small and medium-sized businesses. Examples of planned features:
 
 * Ability to create a full range of business documents, not only invoices
 * Added GUI
